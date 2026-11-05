@@ -15,7 +15,7 @@ let package = Package(
             name: "NovaOS",
             dependencies: [.product(name: "Sparkle", package: "Sparkle")],
             path: "Sources",
-            sources: ["NovaOSApp.swift"]
+            sources: ["NovaOSApp.swift", "NovaNavigation.swift"]
         )
     ]
 )

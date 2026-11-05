@@ -22,10 +22,10 @@ Nova OS for Mac brings the live Nova OS site into a native macOS window and incl
 
 | Nova start page | Web search | Tabbed browsing |
 | --- | --- | --- |
-| A custom Nova dashboard for every new tab | Search Google from the address bar | Keep sites open together in one window |
-| Quick links to Nova OS, YouTube, GitHub, and Google | Enter a website address directly | Open pop-up links in a new tab |
+| A custom Nova dashboard for every new tab | Search with Nova from the address bar | Keep sites open together in Nova-themed tabs |
+| Quick links to Nova OS, YouTube, GitHub, and Wikipedia | Website addresses automatically use HTTPS | Open pop-up links in a new tab |
 
-The browser uses WebKit and includes back, forward, reload, and Nova OS home controls, a thin page-loading indicator, and familiar Mac shortcuts:
+The browser uses macOS WebKit and includes back, forward, reload, and Nova OS home controls, a thin page-loading indicator, and familiar Mac shortcuts. It does not require Google Chrome. Nova Search includes All, Images, Videos, and News views and uses the Nova OS search service, which currently provides results from Bing.
 
 - `⌘T` — new tab
 - `⌘W` — close tab

@@ -7,12 +7,12 @@
     <language>en</language>
     <item>
       <title>Nova OS 1.1.2</title>
-      <pubDate>Thu, 05 Nov 2026 09:35:21 +0800</pubDate>
-      <sparkle:version>3</sparkle:version>
+      <pubDate>Thu, 05 Nov 2026 11:22:31 +0800</pubDate>
+      <sparkle:version>4</sparkle:version>
       <sparkle:shortVersionString>1.1.2</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0.0</sparkle:minimumSystemVersion>
-      <description><![CDATA[<h2>New in Nova OS 1.1.2</h2><ul><li>A custom Nova start page for new tabs.</li><li>A polished Apple-logo icon and refreshed browser chrome.</li><li>Automatic update checks and installation.</li><li>Visible page loading progress and a Nova app menu.</li></ul>]]></description>
-      <enclosure url="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/Nova%20OS%201.1.2.zip" length="2920561" type="application/octet-stream" sparkle:edSignature="AW5/zDDxSAwYzd+MUwSrH4scj8P9XRgzHGmQck0vTr1MXEam8D0eKCrEdZqEwUZlzlprqWNW27LZNCthqRiiAg==" />
+      <description><![CDATA[<h2>New in Nova OS 1.1.2</h2><ul><li>Nova Search is the default for the address bar and new tabs.</li><li>Search categories for images, videos, and news.</li><li>Nova-themed tabs, navigation controls, and search results.</li><li>Website addresses automatically use HTTPS.</li></ul>]]></description>
+      <enclosure url="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/Nova%20OS%201.1.2-build4.zip" length="2935335" type="application/octet-stream" sparkle:edSignature="xT3CUmmKwm1lI4ECDO1lWI06v/AWCYOshYtR9SJY+fWs97VeMEIZXZ/OlJChojGZ2wwi6kjESnOq4t3U8VTeCA==" />
     </item>
   </channel>
 </rss>

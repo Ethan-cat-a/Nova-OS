@@ -16,7 +16,7 @@ UPDATES="$ROOT/updates"
 APPCAST_URL_PREFIX="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/"
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$ROOT/Info.plist")"
 BUILD_NUMBER="$(/usr/libexec/PlistBuddy -c 'Print CFBundleVersion' "$ROOT/Info.plist")"
-UPDATER_ZIP="$UPDATES/Nova OS $VERSION.zip"
+UPDATER_ZIP="$UPDATES/Nova OS $VERSION-build$BUILD_NUMBER.zip"
 
 export SWIFT_MODULE_CACHE_PATH="$BUILD_DIR/SwiftModuleCache"
 export CLANG_MODULE_CACHE_PATH="$BUILD_DIR/ClangModuleCache"
@@ -26,7 +26,7 @@ if [[ ! -f "$KEY" ]]; then
   exit 1
 fi
 
-rm -rf "$OUTPUT" "$PACKAGE" "$ICONSET" "$ICON_PNG" "$ICON_ICNS" "$UPDATER_ZIP" "$UPDATES/appcast.xml"
+rm -rf "$OUTPUT" "$PACKAGE" "$ICONSET" "$ICON_PNG" "$ICON_ICNS" "$UPDATER_ZIP"
 mkdir -p "$BUILD_DIR" "$CONTENTS/MacOS" "$FRAMEWORKS" "$ICONSET" "$UPDATES"
 
 swift package --disable-sandbox \
@@ -41,7 +41,7 @@ swift build --disable-sandbox \
   --config-path "$BUILD_DIR/SwiftPMConfig" \
   --security-path "$BUILD_DIR/SwiftPMSecurity" \
   --scratch-path "$SPM_DIR" \
-  --manifest-cache local -c release --triple arm64-apple-macosx13.0
+  --manifest-cache local -c release -debug-info-format none --triple arm64-apple-macosx13.0
 cp "$SPM_DIR/out/Products/Release/NovaOS" "$BUILD_DIR/NovaOS-arm64"
 
 swift build --disable-sandbox \
@@ -49,7 +49,7 @@ swift build --disable-sandbox \
   --config-path "$BUILD_DIR/SwiftPMConfig" \
   --security-path "$BUILD_DIR/SwiftPMSecurity" \
   --scratch-path "$SPM_DIR" \
-  --manifest-cache local -c release --triple x86_64-apple-macosx13.0
+  --manifest-cache local -c release -debug-info-format none --triple x86_64-apple-macosx13.0
 cp "$SPM_DIR/out/Products/Release/NovaOS" "$BUILD_DIR/NovaOS-x86_64"
 
 ARM_BINARY="$BUILD_DIR/NovaOS-arm64"
@@ -106,10 +106,10 @@ ditto -c -k --sequesterRsrc --keepParent "$OUTPUT" "$UPDATER_ZIP"
 cat > "$UPDATES/Nova OS $VERSION.html" <<HTML
 <h2>Nova OS $VERSION</h2>
 <ul>
-  <li>Added a custom Nova start page for new tabs.</li>
-  <li>Added the Apple inspired Nova OS app icon.</li>
-  <li>Added automatic update checks and installs.</li>
-  <li>Polished the browser chrome and added page loading progress.</li>
+  <li>Nova Search is now the default for the address bar and new tabs.</li>
+  <li>Browse all results, images, videos, and news from the search bar.</li>
+  <li>The tabs and navigation controls now match the Nova theme.</li>
+  <li>Website addresses automatically use HTTPS.</li>
 </ul>
 HTML
 
