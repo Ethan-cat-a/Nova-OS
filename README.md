@@ -1,37 +1,50 @@
 <div align="center">
+  <img src="assets/nova-icon.png" alt="Nova OS Apple-logo icon" width="132" />
   <h1>Nova OS for Mac</h1>
-  <p><strong>Your Nova OS desktop, in a tabbed Mac browser.</strong></p>
+  <p><strong>Your Nova workspace, with the whole web one tab away.</strong></p>
   <p>
-    <a href="https://nova-os-browser.vercel.app/">Open Nova OS</a>
-    &nbsp;·&nbsp; Native macOS app
-    &nbsp;·&nbsp; Apple Silicon + Intel
+    <img src="https://img.shields.io/badge/macOS-13%2B-5967e8?style=for-the-badge&logo=apple&logoColor=white" alt="macOS 13 or later" />
+    <img src="https://img.shields.io/badge/Apple_Silicon-Intel-7654df?style=for-the-badge" alt="Apple Silicon and Intel" />
+    <img src="https://img.shields.io/badge/version-1.1.2-172146?style=for-the-badge" alt="Version 1.1.2" />
   </p>
-  <p><a href="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/downloads/Nova%20OS%20Installer.pkg"><strong>↓ Download for Mac</strong></a></p>
+  <p>
+    <a href="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/downloads/Nova%20OS%20Installer.pkg"><strong>↓ Download Nova OS 1.1.2 for Mac</strong></a>
+    &nbsp; · &nbsp;
+    <a href="https://nova-os-browser.vercel.app/">Open the web version</a>
+  </p>
 </div>
 
 ---
 
-Nova OS for Mac wraps the live Nova OS site in a focused macOS window and adds a simple browser for the rest of the web. Searches go to Google, while websites open right in the app.
+Nova OS for Mac brings the live Nova OS site into a native macOS window and includes a built-in browser for everyday websites.
 
-## At a glance
+## A calmer way to browse
 
-| Search | Browse | Stay organized |
+| Nova start page | Web search | Tabbed browsing |
 | --- | --- | --- |
-| Search Google from the address bar | Open websites in the current tab | Keep multiple pages open in tabs |
-| Paste a URL to go straight there | Open new-window links in a new tab | Use familiar Mac keyboard shortcuts |
+| A custom Nova dashboard for every new tab | Search Google from the address bar | Keep sites open together in one window |
+| Quick links to Nova OS, YouTube, GitHub, and Google | Enter a website address directly | Open pop-up links in a new tab |
 
-### Included
+The browser uses WebKit and includes back, forward, reload, and Nova OS home controls, a thin page-loading indicator, and familiar Mac shortcuts:
 
-- Back, forward, reload, and Nova OS home controls
-- Persistent website data shared between tabs
-- `⌘T` new tab · `⌘W` close tab · `⌘L` search or address · `⌘R` reload
-- Universal app for Apple Silicon and Intel Macs
+- `⌘T` — new tab
+- `⌘W` — close tab
+- `⌘L` — search or enter an address
+- `⌘R` — reload
+
+The **Nova OS** app menu includes the start page, new tab, and update controls.
+
+## Automatic updates
+
+Nova OS checks for updates daily and installs signed releases in the background. **Version 1.1.2 is the first build with the updater**, so install this version once using the package below; later releases can update automatically.
 
 ## Install
 
-Download **Nova OS Installer.pkg** using the button above, then open it and follow the macOS Installer steps. It places **Nova OS** in `/Applications`. You can also create the installer yourself with the build script below.
+1. Download **Nova OS 1.1.2 for Mac** above.
+2. Open `Nova OS Installer.pkg` and follow the macOS Installer steps.
+3. Find **Nova OS** in `/Applications`.
 
-The packaged build requires macOS 13 or later and an internet connection. It loads the live Vercel site; the website and its API routes are not bundled for offline use.
+The app requires macOS 13 or later and an internet connection. It loads the live Vercel site, so that site and its APIs are not available offline. This package is ad-hoc signed and not notarized; macOS may ask you to approve it in **System Settings → Privacy & Security**.
 
 ## Build from source
 
@@ -41,10 +54,6 @@ On a Mac with Xcode Command Line Tools installed:
 ./build.sh
 ```
 
-The script creates `dist/Nova OS.app` and `dist/Nova OS Installer.pkg`. To choose a different app bundle location, pass it as the first argument:
+The script creates `dist/Nova OS.app`, `dist/Nova OS Installer.pkg`, a signed Sparkle update archive under `updates/`, and its appcast. The first build requires network access to resolve Sparkle.
 
-```sh
-./build.sh "$PWD/outputs/Nova OS.app"
-```
-
-The app has an ad hoc signature; the installer is unsigned, and neither is notarized. macOS may ask you to approve installation or first launch in **System Settings → Privacy & Security**.
+The Sparkle signing private key lives in the ignored `.secrets/` directory and is never included in Git. Keep a secure backup of that key: future update archives must use the matching key. The matching public key is embedded in `Info.plist`.
