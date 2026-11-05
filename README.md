@@ -47,4 +47,4 @@ The script creates `dist/Nova OS.app` and `dist/Nova OS Installer.pkg`. To choos
 ./build.sh "$PWD/outputs/Nova OS.app"
 ```
 
-The app uses an ad hoc signature and the installer is not notarized. macOS may ask you to confirm the first launch in **System Settings → Privacy & Security**.
+The app has an ad hoc signature; the installer is unsigned, and neither is notarized. macOS may ask you to approve installation or first launch in **System Settings → Privacy & Security**.
