@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/nova-icon.png" alt="Nova OS Apple-logo icon" width="132" />
+  <img src="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/assets/nova-icon.png" alt="Nova OS Apple-logo icon" width="160" />
   <h1>Nova OS for Mac</h1>
   <p><strong>Your Nova workspace, with the whole web one tab away.</strong></p>
   <p>
