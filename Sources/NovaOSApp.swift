@@ -11,30 +11,32 @@ private enum NovaOS {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="preconnect" href="https://nova-os-browser.vercel.app" crossorigin>
       <title>New Tab — Nova OS</title>
       <style>
         :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
         * { box-sizing: border-box; }
-        body { margin: 0; min-height: 100vh; color: #f6f7ff; background: radial-gradient(ellipse at 50% -18%, rgba(89,105,255,.38), transparent 52%), radial-gradient(ellipse at 88% 72%, rgba(154,78,255,.15), transparent 40%), #0b0d18; display: grid; place-items: center; padding: 48px 24px; }
-        main { width: min(760px, 100%); text-align: center; margin-top: -4vh; }
-        .brand { display: inline-flex; align-items: center; gap: 10px; color: #c9d0ff; font-size: 13px; font-weight: 650; letter-spacing: .13em; text-transform: uppercase; }
-        .mark { width: 29px; height: 29px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(145deg,#8ca0ff,#654bdf); box-shadow: 0 6px 24px #6155db55; font-size: 17px; }
-        h1 { margin: 28px 0 8px; font-size: clamp(44px, 8vw, 68px); line-height: 1.02; letter-spacing: -.055em; font-weight: 690; }
-        .subtitle { margin: 0; color: #a7aec9; font-size: 16px; }
-        form { margin: 36px auto 0; height: 60px; display: flex; align-items: center; gap: 13px; padding: 0 8px 0 19px; max-width: 650px; border-radius: 19px; background: rgba(255,255,255,.075); border: 1px solid rgba(213,220,255,.18); box-shadow: 0 16px 48px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.08); backdrop-filter: blur(18px); }
-        form:focus-within { border-color: rgba(148,162,255,.72); box-shadow: 0 0 0 4px rgba(102,119,255,.14), 0 16px 48px rgba(0,0,0,.24); }
-        .search-icon { color: #9ba7ff; font-size: 19px; }
+        body { margin: 0; min-height: 100vh; color: #f4f6ff; background: radial-gradient(ellipse at 50% -25%, #4057a459, transparent 53%), radial-gradient(ellipse at 95% 90%, #7152a91c, transparent 40%), #0c1120; display: grid; place-items: center; padding: 42px 24px; }
+        main { width: min(720px, 100%); text-align: center; margin-top: -3vh; }
+        .brand { display: inline-flex; align-items: center; gap: 10px; color: #c9d1ec; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+        .mark { width: 38px; height: 38px; border-radius: 13px; display: grid; place-items: center; color: white; background: linear-gradient(145deg,#85a9ff,#8164dc); box-shadow: 0 8px 26px #665ae344; font-size: 20px; }
+        h1 { margin: 24px 0 8px; font-size: clamp(34px, 5vw, 48px); line-height: 1.1; letter-spacing: -.045em; font-weight: 680; }
+        .subtitle { margin: 0; color: #a1acc8; font-size: 14px; }
+        form { margin: 31px auto 0; height: 58px; display: flex; align-items: center; gap: 13px; padding: 0 7px 0 18px; max-width: 660px; border-radius: 18px; background: #1c253b; border: 1px solid #96a8d63d; box-shadow: 0 18px 42px #0003; }
+        form:focus-within { border-color: #a39bff; box-shadow: 0 0 0 4px #8d83ff24, 0 18px 42px #0003; }
+        .search-icon { color: #a5b1ed; font-size: 20px; }
         input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: white; font: inherit; font-size: 16px; }
         input::placeholder { color: #9da4bd; }
-        button { border: 0; border-radius: 13px; padding: 12px 18px; color: white; background: linear-gradient(135deg,#7288ff,#7653e4); font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+        button { border: 0; border-radius: 12px; padding: 12px 17px; color: white; background: linear-gradient(135deg,#728fff,#8b6ce2); font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; }
         button:hover { filter: brightness(1.12); }
-        .section-label { margin: 46px 0 16px; color: #8088a6; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 650; }
+        .section-label { margin: 38px 0 14px; color: #8793b1; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; }
         .links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: left; }
-        .link { padding: 16px; min-height: 92px; border-radius: 17px; color: #f3f4ff; text-decoration: none; background: rgba(255,255,255,.045); border: 1px solid rgba(213,220,255,.09); transition: .18s ease; }
-        .link:hover { transform: translateY(-2px); background: rgba(255,255,255,.09); border-color: rgba(148,162,255,.32); }
-        .link strong { display: block; font-size: 14px; font-weight: 620; }
-        .link span { display: block; margin-top: 7px; color: #949bb5; font-size: 12px; }
-        footer { margin-top: 45px; color: #686f8b; font-size: 12px; }
+        .link { display:flex; align-items:center; gap:10px; padding:13px; min-width:0; border-radius:15px; color:#f2f4ff; text-decoration:none; background:#ffffff09; border:1px solid #d5dcff18; transition:background .18s,border-color .18s; }
+        .link:hover { background:#ffffff12; border-color:#a9baff55; }
+        .link-icon { flex:none; width:34px; height:34px; border-radius:11px; display:grid; place-items:center; background:#879ffb26; color:#b6c3ff; font-weight:750; font-size:15px; }
+        .link strong { display:block; font-size:12px; font-weight:650; overflow:hidden; text-overflow:ellipsis; }
+        .link small { display:block; margin-top:4px; color:#8e9ab8; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        footer { margin-top:40px; color:#7d89a5; font-size:11px; }
         @media (max-width: 560px) { .links { grid-template-columns: repeat(2, 1fr); } form { height: 56px; } button { padding: 11px 13px; } }
       </style>
     </head>
@@ -42,14 +44,14 @@ private enum NovaOS {
       <main>
         <div class="brand"><span class="mark">✦</span> Nova OS</div>
         <h1>Explore with Nova.</h1>
-        <p class="subtitle">Your space to search, discover, and find your way.</p>
-        <form id="search"><span class="search-icon">✦</span><input id="query" aria-label="Search Nova or enter a website" autofocus placeholder="Search Nova or enter a website" autocomplete="off"><button type="submit">Search Nova</button></form>
+        <p class="subtitle">Search the web, or pick up somewhere new.</p>
+        <form id="search"><span class="search-icon">⌕</span><input id="query" aria-label="Search Nova or enter a website" autofocus placeholder="Search Nova or enter a website" autocomplete="off"><button type="submit">Search</button></form>
         <p class="section-label">Quick links</p>
         <div class="links">
-          <a class="link" href="https://nova-os-browser.vercel.app/"><strong>Nova OS</strong><span>Your workspace</span></a>
-          <a class="link" href="https://www.youtube.com/"><strong>YouTube</strong><span>Watch something</span></a>
-          <a class="link" href="https://github.com/"><strong>GitHub</strong><span>Build and explore</span></a>
-          <a class="link" href="https://en.wikipedia.org/"><strong>Wikipedia</strong><span>Discover something</span></a>
+          <a class="link" href="https://nova-os-browser.vercel.app/"><span class="link-icon">✦</span><span><strong>Nova OS</strong><small>Workspace</small></span></a>
+          <a class="link" href="https://www.youtube.com/"><span class="link-icon">▶</span><span><strong>YouTube</strong><small>Watch</small></span></a>
+          <a class="link" href="https://github.com/"><span class="link-icon">⌘</span><span><strong>GitHub</strong><small>Build</small></span></a>
+          <a class="link" href="https://en.wikipedia.org/"><span class="link-icon">W</span><span><strong>Wikipedia</strong><small>Discover</small></span></a>
         </div>
         <footer>⌘ L to search · ⌘ T for another tab</footer>
       </main>
@@ -65,13 +67,23 @@ private enum NovaOS {
     </html>
     """#
 
-    static func searchHTML(query: String) -> String {
-        let encoded = (try? JSONSerialization.data(withJSONObject: query, options: [.fragmentsAllowed]))
-            .flatMap { String(data: $0, encoding: .utf8) } ?? "\"\""
-        let safeQuery = encoded.replacingOccurrences(of: "<", with: "\\u003c")
+    private static func javascriptLiteral(_ value: Any, fallback: String) -> String {
+        let encoded = (try? JSONSerialization.data(withJSONObject: value, options: [.fragmentsAllowed]))
+            .flatMap { String(data: $0, encoding: .utf8) } ?? fallback
+        return encoded.replacingOccurrences(of: "<", with: "\\u003c")
             .replacingOccurrences(of: ">", with: "\\u003e")
             .replacingOccurrences(of: "&", with: "\\u0026")
-        return searchPage.replacingOccurrences(of: "__NOVA_QUERY__", with: safeQuery)
+    }
+
+    static func searchHTML(query: String, cached: [String: Any] = [:]) -> String {
+        guard let queryMarker = searchPage.range(of: "__NOVA_QUERY__"),
+              let cacheMarker = searchPage.range(of: "__NOVA_CACHED__"),
+              queryMarker.upperBound <= cacheMarker.lowerBound else { return searchPage }
+        return String(searchPage[..<queryMarker.lowerBound])
+            + javascriptLiteral(query, fallback: "\"\"")
+            + String(searchPage[queryMarker.upperBound..<cacheMarker.lowerBound])
+            + javascriptLiteral(cached, fallback: "{}")
+            + String(searchPage[cacheMarker.upperBound...])
     }
 
     static let searchPage = #"""
@@ -80,7 +92,7 @@ private enum NovaOS {
     <title>Nova Search</title><style>
     :root{color-scheme:dark;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif}
     *{box-sizing:border-box}body{margin:0;min-height:100vh;color:#f2f4ff;background:radial-gradient(ellipse at 95% -10%,#5443a035,transparent 38%),#0d1222}
-    header{position:sticky;top:0;z-index:2;background:#11172aed;border-bottom:1px solid #c7d2ff1a;backdrop-filter:blur(24px)}
+    header{position:sticky;top:0;z-index:2;background:#11172a;border-bottom:1px solid #c7d2ff1a}
     .top{max-width:1180px;margin:auto;display:flex;align-items:center;gap:26px;padding:24px 34px 12px}.brand{display:flex;align-items:center;gap:10px;white-space:nowrap;font-size:13px;font-weight:760;letter-spacing:.13em;color:#e4e6ff}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:12px;color:#fff;font-size:20px;background:linear-gradient(140deg,#719eff,#9c6bea);box-shadow:0 7px 22px #776eff55}
     form{display:flex;align-items:center;gap:12px;flex:1;max-width:720px;padding:7px 8px 7px 18px;border:1px solid #aabaff30;border-radius:22px;background:#ffffff0d;box-shadow:0 8px 30px #0003}form:focus-within{border-color:#a499ff;box-shadow:0 0 0 3px #8b80ff22}
     .search-icon{color:#a8b3e5;font-size:19px}input{flex:1;min-width:0;color:#fff;background:transparent;border:0;outline:0;font:inherit;font-size:15px}button{font:inherit;cursor:pointer}.submit{border:0;border-radius:15px;padding:10px 17px;background:linear-gradient(120deg,#718dff,#956ce9);color:white;font-weight:650}
@@ -96,7 +108,7 @@ private enum NovaOS {
     <script>
     const query=__NOVA_QUERY__, field=document.getElementById('query'), results=document.getElementById('results');field.value=query;
     document.getElementById('search').addEventListener('submit',event=>{event.preventDefault();const value=field.value.trim();if(value) window.webkit.messageHandlers.novaNavigate.postMessage(value)});
-    const summary=document.getElementById('summary'),provider=document.getElementById('provider');let sequence=0;
+    const summary=document.getElementById('summary'),provider=document.getElementById('provider');let sequence=0,activeRequest=null;const searchCache=new Map(Object.entries(__NOVA_CACHED__));
     function status(message){results.replaceChildren();const p=document.createElement('p');p.className='status';p.textContent=message;results.append(p)}
     function webURL(value){try{const url=new URL(value);return ['https:','http:'].includes(url.protocol)?url:null}catch{return null}}
     function video(item){const raw=String(item.snippet||'').match(/\]\((https?:\/\/[^)\s]+)\)/);const candidate=webURL(raw?raw[1]:item.url);if(!candidate)return null;
@@ -114,14 +126,14 @@ private enum NovaOS {
       const title=document.createElement('div');title.className='title';title.textContent=clip?.title||item.title||url.hostname;
       const snippet=document.createElement('p');snippet.className='snippet';snippet.textContent=type==='videos'?'':String(item.snippet||'').replace(/\[[^\]]+\]\([^)]+\)/g,'');
       details.append(site,title,snippet);link.append(details);results.append(link);return true;}
-    async function search(type){const current=++sequence;document.querySelectorAll('nav button').forEach(button=>button.setAttribute('aria-selected',String(button.dataset.type===type)));
+    async function search(type){const current=++sequence;if(activeRequest)activeRequest.abort();document.querySelectorAll('nav button').forEach(button=>button.setAttribute('aria-selected',String(button.dataset.type===type)));
       results.className=type==='images'?'grid':type==='videos'?'videos':'';provider.textContent='';summary.textContent='Searching '+(type==='all'?'the web':type)+' for “'+query+'”…';status('Looking for results…');
-      try{const response=await fetch('https://nova-os-browser.vercel.app/api/search?q='+encodeURIComponent(query)+'&type='+encodeURIComponent(type),{cache:'no-store'});if(!response.ok)throw new Error('Search unavailable');const data=await response.json();if(current!==sequence)return;
+      try{let data;const cached=searchCache.get(type);if(cached&&Date.now()-cached.time<300000){data=cached.data;activeRequest=null}else{activeRequest=new AbortController();const response=await fetch('https://nova-os-browser.vercel.app/api/search?q='+encodeURIComponent(query)+'&type='+encodeURIComponent(type),{cache:'no-store',signal:activeRequest.signal});if(!response.ok)throw new Error('Search unavailable');data=await response.json();if(current!==sequence)return;searchCache.set(type,{time:Date.now(),data});window.webkit?.messageHandlers?.novaCache?.postMessage({query,type,data});activeRequest=null}if(current!==sequence)return;
         results.replaceChildren();let count=0;for(const item of (Array.isArray(data.results)?data.results:[]))if(addResult(item,type))count++;
         summary.textContent=(count?count+' results':'No results')+' for “'+query+'”';if(!count)status('No '+(type==='all'?'web':type)+' results found. Try another search.');
         if(type==='videos'){const more=document.createElement('a');more.className='result';more.href='https://www.youtube.com/results?search_query='+encodeURIComponent(query);const label=document.createElement('span');label.className='title';label.textContent='Browse videos on YouTube ↗';more.append(label);results.append(more)}
         if(data.provider)provider.textContent='Results provided by '+data.provider;
-      }catch{if(current===sequence){summary.textContent='Search unavailable';status('Nova Search could not connect. Check your internet connection and try again.')}}}
+      }catch(error){if(current===sequence&&error.name!=='AbortError'){activeRequest=null;summary.textContent='Search unavailable';status('Nova Search could not connect. Check your internet connection and try again.')}}}
     document.querySelectorAll('nav button').forEach(button=>button.addEventListener('click',()=>search(button.dataset.type)));search('all');
     </script></body></html>
     """#
@@ -163,6 +175,8 @@ private final class BrowserTab {
 
 @MainActor
 private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
+    private struct SearchKey: Hashable { let query: String; let type: String }
+    private struct CachedSearch { let data: [String: Any]; let time: Date }
     private var window: NSWindow!
     private var tabBar: NSStackView!
     private var contentHost: NSView!
@@ -174,6 +188,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
     private var tabs: [BrowserTab] = []
     private var selectedTabID: UUID?
     private var updaterController: SPUStandardUpdaterController!
+    private var recentSearches: [SearchKey: CachedSearch] = [:]
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         updaterController = SPUStandardUpdaterController(
@@ -208,7 +223,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         tabBar.alignment = .centerY
         tabBar.distribution = .fill
         tabBar.spacing = 5
-        tabBar.edgeInsets = NSEdgeInsets(top: 5, left: 12, bottom: 5, right: 12)
+        tabBar.edgeInsets = NSEdgeInsets(top: 0, left: 6, bottom: 0, right: 6)
 
         let tabScrollView = NSScrollView()
         tabScrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -218,54 +233,42 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         tabScrollView.borderType = .noBorder
 
         let newTabButton = makeSymbolButton("plus", tooltip: "New Tab", action: #selector(newTab))
-        let tabStrip = NSVisualEffectView()
+        let tabStrip = NSView()
         tabStrip.translatesAutoresizingMaskIntoConstraints = false
-        tabStrip.material = .titlebar
-        tabStrip.blendingMode = .withinWindow
-        tabStrip.state = .followsWindowActiveState
         tabStrip.wantsLayer = true
-        tabStrip.layer?.backgroundColor = NSColor(srgbRed: 0.075, green: 0.085, blue: 0.17, alpha: 0.9).cgColor
+        tabStrip.layer?.backgroundColor = NSColor(srgbRed: 0.075, green: 0.085, blue: 0.155, alpha: 1).cgColor
         tabStrip.addSubview(tabScrollView)
-        tabStrip.addSubview(newTabButton)
+        tabBar.addArrangedSubview(newTabButton)
         NSLayoutConstraint.activate([
             tabScrollView.leadingAnchor.constraint(equalTo: tabStrip.leadingAnchor, constant: 8),
-            tabScrollView.trailingAnchor.constraint(equalTo: newTabButton.leadingAnchor, constant: -8),
+            tabScrollView.trailingAnchor.constraint(equalTo: tabStrip.trailingAnchor, constant: -8),
             tabScrollView.centerYAnchor.constraint(equalTo: tabStrip.centerYAnchor),
-            tabScrollView.heightAnchor.constraint(equalToConstant: 31),
-            newTabButton.trailingAnchor.constraint(equalTo: tabStrip.trailingAnchor, constant: -10),
-            newTabButton.centerYAnchor.constraint(equalTo: tabStrip.centerYAnchor),
-            newTabButton.widthAnchor.constraint(equalToConstant: 28),
-            newTabButton.heightAnchor.constraint(equalToConstant: 28),
+            tabScrollView.heightAnchor.constraint(equalToConstant: 34),
             tabStrip.heightAnchor.constraint(equalToConstant: 40)
         ])
 
         tabBar.translatesAutoresizingMaskIntoConstraints = false
         tabScrollView.documentView = tabBar
         tabBar.heightAnchor.constraint(equalTo: tabScrollView.contentView.heightAnchor).isActive = true
-        tabBar.widthAnchor.constraint(greaterThanOrEqualTo: tabScrollView.contentView.widthAnchor).isActive = true
 
         let navigationBar = makeNavigationBar()
-        let chromeStack = NSStackView(views: [tabStrip, navigationBar])
-        chromeStack.orientation = .vertical
-        chromeStack.alignment = .width
-        chromeStack.distribution = .fill
-        chromeStack.spacing = 0
-        chromeStack.translatesAutoresizingMaskIntoConstraints = false
-
-        let chrome = NSVisualEffectView()
-        chrome.material = .titlebar
-        chrome.blendingMode = .withinWindow
-        chrome.state = .followsWindowActiveState
+        navigationBar.translatesAutoresizingMaskIntoConstraints = false
+        let chrome = NSView()
         chrome.wantsLayer = true
-        chrome.layer?.backgroundColor = NSColor(srgbRed: 0.065, green: 0.075, blue: 0.15, alpha: 0.93).cgColor
+        chrome.layer?.backgroundColor = NSColor(srgbRed: 0.095, green: 0.105, blue: 0.18, alpha: 1).cgColor
         chrome.translatesAutoresizingMaskIntoConstraints = false
-        chrome.addSubview(chromeStack)
+        chrome.addSubview(tabStrip)
+        chrome.addSubview(navigationBar)
         NSLayoutConstraint.activate([
-            chromeStack.leadingAnchor.constraint(equalTo: chrome.leadingAnchor),
-            chromeStack.trailingAnchor.constraint(equalTo: chrome.trailingAnchor),
-            chromeStack.topAnchor.constraint(equalTo: chrome.topAnchor),
-            chromeStack.bottomAnchor.constraint(equalTo: chrome.bottomAnchor),
-            chrome.heightAnchor.constraint(equalToConstant: 95)
+            tabStrip.leadingAnchor.constraint(equalTo: chrome.leadingAnchor),
+            tabStrip.trailingAnchor.constraint(equalTo: chrome.trailingAnchor),
+            tabStrip.topAnchor.constraint(equalTo: chrome.topAnchor),
+            navigationBar.leadingAnchor.constraint(equalTo: chrome.leadingAnchor),
+            navigationBar.trailingAnchor.constraint(equalTo: chrome.trailingAnchor),
+            navigationBar.topAnchor.constraint(equalTo: tabStrip.bottomAnchor),
+            navigationBar.bottomAnchor.constraint(equalTo: chrome.bottomAnchor),
+            navigationBar.heightAnchor.constraint(equalToConstant: 54),
+            chrome.heightAnchor.constraint(equalToConstant: 94)
         ])
 
         progressIndicator = NSProgressIndicator()
@@ -280,25 +283,24 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         contentHost = NSView()
         contentHost.translatesAutoresizingMaskIntoConstraints = false
 
-        let root = NSStackView(views: [chrome, progressIndicator, contentHost])
-        root.orientation = .vertical
-        root.alignment = .width
-        root.distribution = .fill
-        root.spacing = 0
-        root.translatesAutoresizingMaskIntoConstraints = false
-        root.setHuggingPriority(.defaultLow, for: .vertical)
-        navigationBar.heightAnchor.constraint(equalToConstant: 54).isActive = true
-        progressIndicator.heightAnchor.constraint(equalToConstant: 2).isActive = true
-        contentHost.setContentHuggingPriority(.defaultLow, for: .vertical)
-
-        let container = NSView()
-        container.addSubview(root)
+        let container = NSView(frame: NSRect(origin: .zero, size: window.contentLayoutRect.size))
+        container.autoresizingMask = [.width, .height]
+        container.addSubview(contentHost)
+        container.addSubview(chrome)
+        container.addSubview(progressIndicator)
         window.contentView = container
         NSLayoutConstraint.activate([
-            root.leadingAnchor.constraint(equalTo: container.leadingAnchor),
-            root.trailingAnchor.constraint(equalTo: container.trailingAnchor),
-            root.topAnchor.constraint(equalTo: container.topAnchor),
-            root.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+            chrome.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            chrome.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            chrome.topAnchor.constraint(equalTo: container.topAnchor),
+            contentHost.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            contentHost.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            contentHost.topAnchor.constraint(equalTo: chrome.bottomAnchor),
+            contentHost.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            progressIndicator.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            progressIndicator.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            progressIndicator.topAnchor.constraint(equalTo: chrome.bottomAnchor),
+            progressIndicator.heightAnchor.constraint(equalToConstant: 2)
         ])
 
         window.makeKeyAndOrderFront(nil)
@@ -319,20 +321,37 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         addressField.focusRingType = .default
         addressField.font = NSFont.systemFont(ofSize: 13.5, weight: .medium)
         addressField.toolTip = "Search Nova or enter a website address"
+        addressField.isBordered = false
+        addressField.drawsBackground = false
+        let addressContainer = NSView()
+        addressContainer.translatesAutoresizingMaskIntoConstraints = false
+        addressContainer.wantsLayer = true
+        addressContainer.layer?.cornerRadius = 11
+        addressContainer.layer?.borderWidth = 1
+        addressContainer.layer?.borderColor = NSColor.white.withAlphaComponent(0.1).cgColor
+        addressContainer.layer?.backgroundColor = NSColor(srgbRed: 0.14, green: 0.16, blue: 0.24, alpha: 1).cgColor
+        addressContainer.addSubview(addressField)
+        NSLayoutConstraint.activate([
+            addressContainer.heightAnchor.constraint(equalToConstant: 34),
+            addressField.leadingAnchor.constraint(equalTo: addressContainer.leadingAnchor, constant: 8),
+            addressField.trailingAnchor.constraint(equalTo: addressContainer.trailingAnchor, constant: -8),
+            addressField.centerYAnchor.constraint(equalTo: addressContainer.centerYAnchor),
+            addressField.heightAnchor.constraint(equalToConstant: 23)
+        ])
 
         let brand = NSTextField(labelWithString: "✦  NOVA")
         brand.font = NSFont.systemFont(ofSize: 11, weight: .bold)
         brand.textColor = NSColor(srgbRed: 0.75, green: 0.73, blue: 1, alpha: 1)
         brand.setContentHuggingPriority(.required, for: .horizontal)
 
-        let bar = NSStackView(views: [brand, backButton, forwardButton, reloadButton, homeButton, addressField])
+        let bar = NSStackView(views: [brand, backButton, forwardButton, reloadButton, homeButton, addressContainer])
         bar.orientation = .horizontal
         bar.alignment = .centerY
         bar.distribution = .fill
         bar.spacing = 8
         bar.edgeInsets = NSEdgeInsets(top: 9, left: 14, bottom: 9, right: 14)
-        addressField.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        addressField.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        addressContainer.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        addressContainer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         return bar
     }
 
@@ -354,6 +373,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
         configuration.userContentController.add(self, name: "novaNavigate")
+        configuration.userContentController.add(self, name: "novaCache")
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -401,7 +421,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         itemView.identifier = NSUserInterfaceItemIdentifier(id.uuidString)
         itemView.wantsLayer = true
         tabs.append(tab)
-        tabBar.addArrangedSubview(itemView)
+        tabBar.insertArrangedSubview(itemView, at: max(0, tabBar.arrangedSubviews.count - 1))
 
         if select { selectTab(tab) }
         if let initialURL {
@@ -447,10 +467,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         let pageTitle = tab.webView.title?.trimmingCharacters(in: .whitespacesAndNewlines)
         let host = tab.webView.url?.host
         let title = (pageTitle?.isEmpty == false ? pageTitle : nil) ?? host ?? "New Tab"
-        tab.button.title = title.count > 28 ? String(title.prefix(27)) + "…" : title
+        let tabTitle = title == "New Tab — Nova OS" ? "New Tab" : title
+        tab.button.title = tabTitle.count > 28 ? String(tabTitle.prefix(27)) + "…" : tabTitle
         tab.button.toolTip = tab.webView.url?.absoluteString ?? title
         if tab.id == selectedTabID {
-            window.title = title == NovaOS.appName ? NovaOS.appName : "\(title) — \(NovaOS.appName)"
+            window.title = title == NovaOS.appName || title.hasSuffix(" — \(NovaOS.appName)") ? title : "\(title) — \(NovaOS.appName)"
             addressField.stringValue = displayAddress(for: tab.webView)
             updateNavigationButtons()
         }
@@ -497,7 +518,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         switch destination {
         case .search(let input):
             tab.isInternalPage = true
-            tab.webView.loadHTMLString(NovaOS.searchHTML(query: input), baseURL: nil)
+            tab.webView.loadHTMLString(NovaOS.searchHTML(query: input, cached: cachedResults(for: input)), baseURL: nil)
         case .website(let url):
             tab.isInternalPage = false
             if tab.id == selectedTabID { addressField.stringValue = url.absoluteString }
@@ -506,10 +527,41 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        guard message.name == "novaNavigate", message.frameInfo.isMainFrame,
-              let webView = message.webView, let tab = tab(for: webView), tab.isInternalPage,
-              let input = message.body as? String else { return }
-        navigate(input, in: tab)
+        guard message.frameInfo.isMainFrame, let webView = message.webView,
+              let tab = tab(for: webView), tab.isInternalPage else { return }
+        if message.name == "novaNavigate", let input = message.body as? String {
+            navigate(input, in: tab)
+        } else if message.name == "novaCache", let body = message.body as? [String: Any],
+                  let query = body["query"] as? String, let type = body["type"] as? String,
+                  let data = body["data"] as? [String: Any] {
+            rememberResults(data, query: query, type: type)
+        }
+    }
+
+    private func cachedResults(for query: String) -> [String: Any] {
+        let now = Date()
+        recentSearches = recentSearches.filter { now.timeIntervalSince($0.value.time) < 300 }
+        var entries: [String: Any] = [:]
+        for (key, value) in recentSearches where key.query == query {
+            entries[key.type] = ["time": value.time.timeIntervalSince1970 * 1000, "data": value.data]
+        }
+        return entries
+    }
+
+    private func rememberResults(_ data: [String: Any], query: String, type: String) {
+        guard !query.isEmpty, query.utf8.count <= 2048,
+              ["all", "images", "videos", "news"].contains(type),
+              let results = data["results"] as? [Any], !results.isEmpty,
+              JSONSerialization.isValidJSONObject(data),
+              let bytes = try? JSONSerialization.data(withJSONObject: data), bytes.count <= 256_000 else { return }
+        let now = Date()
+        recentSearches = recentSearches.filter { now.timeIntervalSince($0.value.time) < 300 }
+        let key = SearchKey(query: query, type: type)
+        if recentSearches.count >= 40, recentSearches[key] == nil,
+           let oldest = recentSearches.min(by: { $0.value.time < $1.value.time })?.key {
+            recentSearches.removeValue(forKey: oldest)
+        }
+        recentSearches[key] = CachedSearch(data: data, time: now)
     }
 
     private func configureMenu() {

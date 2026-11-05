@@ -27,6 +27,8 @@ Nova OS for Mac brings the live Nova OS site into a native macOS window and incl
 
 The browser uses macOS WebKit and includes back, forward, reload, and Nova OS home controls, a thin page-loading indicator, and familiar Mac shortcuts. It does not require Google Chrome. Nova Search includes All, Images, Videos, and News views and uses the Nova OS search service, which currently provides results from Bing.
 
+Recent search results stay in memory for five minutes while the app is open, so revisiting a category or repeating a search is immediate. First-time searches still depend on the search service and your connection.
+
 - `⌘T` — new tab
 - `⌘W` — close tab
 - `⌘L` — search or enter an address

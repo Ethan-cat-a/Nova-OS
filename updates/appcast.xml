@@ -7,12 +7,12 @@
     <language>en</language>
     <item>
       <title>Nova OS 1.1.2</title>
-      <pubDate>Thu, 05 Nov 2026 11:22:31 +0800</pubDate>
-      <sparkle:version>4</sparkle:version>
+      <pubDate>Thu, 05 Nov 2026 13:09:49 +0800</pubDate>
+      <sparkle:version>5</sparkle:version>
       <sparkle:shortVersionString>1.1.2</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0.0</sparkle:minimumSystemVersion>
-      <description><![CDATA[<h2>New in Nova OS 1.1.2</h2><ul><li>Nova Search is the default for the address bar and new tabs.</li><li>Search categories for images, videos, and news.</li><li>Nova-themed tabs, navigation controls, and search results.</li><li>Website addresses automatically use HTTPS.</li></ul>]]></description>
-      <enclosure url="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/Nova%20OS%201.1.2-build4.zip" length="2935335" type="application/octet-stream" sparkle:edSignature="xT3CUmmKwm1lI4ECDO1lWI06v/AWCYOshYtR9SJY+fWs97VeMEIZXZ/OlJChojGZ2wwi6kjESnOq4t3U8VTeCA==" />
+      <description><![CDATA[<h2>New in Nova OS 1.1.2</h2><ul><li>A redesigned tab bar and address bar that fit the window.</li><li>A cleaner Nova start page and browser design.</li><li>Faster switching between recently viewed search categories.</li></ul>]]></description>
+      <enclosure url="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/Nova%20OS%201.1.2-build5.zip" length="2959513" type="application/octet-stream" sparkle:edSignature="tYdrFPuVeUTiq6LWdAqu0Vu/TQosfvPUo5mbGyaIYUSEMyLMwGdJJnL1h6TwcS0noKZU3B4QwKFK42DvXlj5Bw==" />
     </item>
   </channel>
 </rss>
