@@ -36,9 +36,9 @@ ET.SubElement(item, f"{{{sparkle_ns}}}minimumSystemVersion").text = "13.0.0"
 description_html = (
     "<h2>New in Nova OS " + short_version + "</h2>"
     "<ul>"
-    "<li>A redesigned tab bar and address bar that fit the window.</li>"
-    "<li>A cleaner Nova start page and browser design.</li>"
-    "<li>Faster switching between recently viewed search categories.</li>"
+    "<li>Nova restores your open tabs at the next launch.</li>"
+    "<li>Save and open bookmarks from the star button and Bookmarks menu.</li>"
+    "<li>Recent results return instantly when you reopen a search tab.</li>"
     "</ul>"
 )
 ET.SubElement(item, "description").text = "NOVA_RELEASE_NOTES"

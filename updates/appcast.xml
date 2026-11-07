@@ -7,12 +7,12 @@
     <language>en</language>
     <item>
       <title>Nova OS 1.1.2</title>
-      <pubDate>Sat, 07 Nov 2026 21:44:23 +0800</pubDate>
+      <pubDate>Sat, 07 Nov 2026 22:14:57 +0800</pubDate>
       <sparkle:version>6</sparkle:version>
       <sparkle:shortVersionString>1.1.2</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0.0</sparkle:minimumSystemVersion>
-      <description><![CDATA[<h2>New in Nova OS 1.1.2</h2><ul><li>A redesigned tab bar and address bar that fit the window.</li><li>A cleaner Nova start page and browser design.</li><li>Faster switching between recently viewed search categories.</li></ul>]]></description>
-      <enclosure url="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/Nova%20OS%201.1.2-build6.zip" length="3023422" type="application/octet-stream" sparkle:edSignature="35Y1T7JbQKMOruVeSK9fOAabPijnOu9zpTGuOvNzCg0Oj8kfAykeTRfCuI1YL2lLzggY2vM0MAmTfWBR22B0AA==" />
+      <description><![CDATA[<h2>New in Nova OS 1.1.2</h2><ul><li>Nova restores your open tabs at the next launch.</li><li>Save and open bookmarks from the star button and Bookmarks menu.</li><li>Recent results return instantly when you reopen a search tab.</li></ul>]]></description>
+      <enclosure url="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/Nova%20OS%201.1.2-build6.zip" length="3023422" type="application/octet-stream" sparkle:edSignature="hg8U0+DEqvFCvqQJx/j8INcvFGDR6o5Ip0dMdngEScGa1aFy17uWVizB3APpMu8trrmheA2ez8eAFNwSPRjXDA==" />
     </item>
   </channel>
 </rss>
