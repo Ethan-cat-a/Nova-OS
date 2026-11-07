@@ -5,10 +5,10 @@
   <p>
     <img src="https://img.shields.io/badge/macOS-13%2B-5967e8?style=for-the-badge&logo=apple&logoColor=white" alt="macOS 13 or later" />
     <img src="https://img.shields.io/badge/Apple_Silicon-Intel-7654df?style=for-the-badge" alt="Apple Silicon and Intel" />
-    <img src="https://img.shields.io/badge/version-1.1.2-172146?style=for-the-badge" alt="Version 1.1.2" />
+    <img src="https://img.shields.io/badge/version-1.1.5-172146?style=for-the-badge" alt="Version 1.1.5" />
   </p>
   <p>
-    <a href="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/downloads/Nova%20OS%20Installer.pkg"><strong>↓ Download Nova OS 1.1.2 for Mac</strong></a>
+    <a href="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/downloads/Nova%20OS%20Installer.pkg"><strong>↓ Download Nova OS 1.1.5 for Mac</strong></a>
     &nbsp; · &nbsp;
     <a href="https://nova-os-browser.vercel.app/">Open the web version</a>
   </p>
@@ -40,11 +40,11 @@ The **Nova OS** app menu includes the start page, new tab, and update controls. 
 
 ## Automatic updates
 
-Nova OS checks for updates daily and installs signed releases in the background. **Version 1.1.2 is the first build with the updater**, so install this version once using the package below; later releases can update automatically.
+Nova OS checks for updates daily and installs signed releases with Sparkle. Existing installations can choose **Nova OS → Check for Updates…** to get version 1.1.5; fresh installations can use the package below. Later signed releases install automatically.
 
 ## Install
 
-1. Download **Nova OS 1.1.2 for Mac** above.
+1. Download **Nova OS 1.1.5 for Mac** above.
 2. Open `Nova OS Installer.pkg` and follow the macOS Installer steps.
 3. Find **Nova OS** in `/Applications`.
 

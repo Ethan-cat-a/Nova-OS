@@ -106,8 +106,8 @@ ditto -c -k --sequesterRsrc --keepParent "$OUTPUT" "$UPDATER_ZIP"
 cat > "$UPDATES/Nova OS $VERSION.html" <<HTML
 <h2>Nova OS $VERSION</h2>
 <ul>
-  <li>Nova restores your open tabs at the next launch.</li>
-  <li>Save and open bookmarks from the star button and Bookmarks menu.</li>
+  <li>Signed automatic updates are enabled through Sparkle.</li>
+  <li>Open tabs and bookmarks are saved on your Mac.</li>
   <li>Recent results return instantly when you reopen a search tab.</li>
 </ul>
 HTML

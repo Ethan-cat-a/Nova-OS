@@ -6,13 +6,13 @@
     <description>Updates for Nova OS for Mac</description>
     <language>en</language>
     <item>
-      <title>Nova OS 1.1.2</title>
-      <pubDate>Sat, 07 Nov 2026 22:14:57 +0800</pubDate>
-      <sparkle:version>6</sparkle:version>
-      <sparkle:shortVersionString>1.1.2</sparkle:shortVersionString>
+      <title>Nova OS 1.1.5</title>
+      <pubDate>Sat, 07 Nov 2026 22:25:00 +0800</pubDate>
+      <sparkle:version>7</sparkle:version>
+      <sparkle:shortVersionString>1.1.5</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0.0</sparkle:minimumSystemVersion>
-      <description><![CDATA[<h2>New in Nova OS 1.1.2</h2><ul><li>Nova restores your open tabs at the next launch.</li><li>Save and open bookmarks from the star button and Bookmarks menu.</li><li>Recent results return instantly when you reopen a search tab.</li></ul>]]></description>
-      <enclosure url="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/Nova%20OS%201.1.2-build6.zip" length="3023422" type="application/octet-stream" sparkle:edSignature="hg8U0+DEqvFCvqQJx/j8INcvFGDR6o5Ip0dMdngEScGa1aFy17uWVizB3APpMu8trrmheA2ez8eAFNwSPRjXDA==" />
+      <description><![CDATA[<h2>New in Nova OS 1.1.5</h2><ul><li>Signed automatic updates are enabled through Sparkle.</li><li>Open tabs and bookmarks are saved on your Mac.</li><li>Recent results return instantly when you reopen a search tab.</li></ul>]]></description>
+      <enclosure url="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/Nova%20OS%201.1.5-build7.zip" length="3023424" type="application/octet-stream" sparkle:edSignature="em9efNVdmCP/H60ZNNZS78hApB4deeqg6eCgfN36vU7ige3Fg7M4At1W4hF7lSfoPxtDwFNVPrMvPhcMUOrHBw==" />
     </item>
   </channel>
 </rss>
