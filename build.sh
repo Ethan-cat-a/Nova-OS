@@ -106,9 +106,9 @@ ditto -c -k --sequesterRsrc --keepParent "$OUTPUT" "$UPDATER_ZIP"
 cat > "$UPDATES/Nova OS $VERSION.html" <<HTML
 <h2>Nova OS $VERSION</h2>
 <ul>
-  <li>Rebuilt the tab bar and address bar to use the full window width.</li>
-  <li>Refreshed the Nova start page and simplified the browser design.</li>
-  <li>Search categories load instantly when you return to recent results.</li>
+  <li>Nova restores your open tabs at the next launch.</li>
+  <li>Save and open bookmarks from the star button and Bookmarks menu.</li>
+  <li>Recent results return instantly when you reopen a search tab.</li>
 </ul>
 HTML
 

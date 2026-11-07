@@ -25,16 +25,18 @@ Nova OS for Mac brings the live Nova OS site into a native macOS window and incl
 | A custom Nova dashboard for every new tab | Search with Nova from the address bar | Keep sites open together in Nova-themed tabs |
 | Quick links to Nova OS, YouTube, GitHub, and Wikipedia | Website addresses automatically use HTTPS | Open pop-up links in a new tab |
 
+Nova remembers up to 25 open tabs and restores them the next time you launch it. Inactive tabs wait to load until you select them, so reopening a session doesn't start every site at once. Save and remove bookmarks with the star in the address bar, then open them from the **Bookmarks** menu.
+
 The browser uses macOS WebKit and includes back, forward, reload, and Nova OS home controls, a thin page-loading indicator, and familiar Mac shortcuts. It does not require Google Chrome. Nova Search includes All, Images, Videos, and News views and uses the Nova OS search service, which currently provides results from Bing.
 
-Recent search results stay in memory for five minutes while the app is open, so revisiting a category or repeating a search is immediate. First-time searches still depend on the search service and your connection.
+Search results stay in memory for five minutes. Results for searches in open tabs are also saved with the session, so those pages can reopen immediately after you restart Nova. A new, uncached search still depends on the search service and your connection.
 
 - `⌘T` — new tab
 - `⌘W` — close tab
 - `⌘L` — search or enter an address
 - `⌘R` — reload
 
-The **Nova OS** app menu includes the start page, new tab, and update controls.
+The **Nova OS** app menu includes the start page, new tab, and update controls. The **Bookmarks** menu lists saved sites and opens a bookmark manager to remove them.
 
 ## Automatic updates
 

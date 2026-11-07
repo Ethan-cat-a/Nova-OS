@@ -7,12 +7,12 @@
     <language>en</language>
     <item>
       <title>Nova OS 1.1.2</title>
-      <pubDate>Thu, 05 Nov 2026 13:09:49 +0800</pubDate>
-      <sparkle:version>5</sparkle:version>
+      <pubDate>Sat, 07 Nov 2026 21:44:23 +0800</pubDate>
+      <sparkle:version>6</sparkle:version>
       <sparkle:shortVersionString>1.1.2</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0.0</sparkle:minimumSystemVersion>
       <description><![CDATA[<h2>New in Nova OS 1.1.2</h2><ul><li>A redesigned tab bar and address bar that fit the window.</li><li>A cleaner Nova start page and browser design.</li><li>Faster switching between recently viewed search categories.</li></ul>]]></description>
-      <enclosure url="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/Nova%20OS%201.1.2-build5.zip" length="2959513" type="application/octet-stream" sparkle:edSignature="tYdrFPuVeUTiq6LWdAqu0Vu/TQosfvPUo5mbGyaIYUSEMyLMwGdJJnL1h6TwcS0noKZU3B4QwKFK42DvXlj5Bw==" />
+      <enclosure url="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/Nova%20OS%201.1.2-build6.zip" length="3023422" type="application/octet-stream" sparkle:edSignature="35Y1T7JbQKMOruVeSK9fOAabPijnOu9zpTGuOvNzCg0Oj8kfAykeTRfCuI1YL2lLzggY2vM0MAmTfWBR22B0AA==" />
     </item>
   </channel>
 </rss>

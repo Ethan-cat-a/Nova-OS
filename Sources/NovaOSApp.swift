@@ -163,20 +163,47 @@ private final class BrowserTab {
     var progressObservation: NSKeyValueObservation?
     var titleObservation: NSKeyValueObservation?
     var isInternalPage = false
+    var hasLoaded = false
+    var sessionEntry: SessionEntry
 
-    init(id: UUID, webView: WKWebView, button: NSButton, closeButton: NSButton, itemView: NSStackView) {
+    init(id: UUID, webView: WKWebView, button: NSButton, closeButton: NSButton, itemView: NSStackView, sessionEntry: SessionEntry) {
         self.id = id
         self.webView = webView
         self.button = button
         self.closeButton = closeButton
         self.itemView = itemView
+        self.sessionEntry = sessionEntry
     }
 }
 
+private struct SessionEntry: Codable {
+    enum Kind: String, Codable { case home, search, website }
+    var kind: Kind
+    var value: String?
+    var cached: [SavedSearchResult] = []
+}
+
+private struct SavedSearchResult: Codable {
+    var type: String
+    var data: Data
+    var savedAt: Date
+}
+
 @MainActor
-private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
+private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
+    private struct SavedSession: Codable {
+        var tabs: [SessionEntry]
+        var selectedIndex: Int
+    }
+    private struct Bookmark: Codable {
+        var id: UUID
+        var title: String
+        var url: String
+    }
     private struct SearchKey: Hashable { let query: String; let type: String }
     private struct CachedSearch { let data: [String: Any]; let time: Date }
+    private static let sessionDefaultsKey = "NovaOS.savedSession.v1"
+    private static let bookmarksDefaultsKey = "NovaOS.bookmarks.v1"
     private var window: NSWindow!
     private var tabBar: NSStackView!
     private var contentHost: NSView!
@@ -185,10 +212,14 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
     private var backButton: NSButton!
     private var forwardButton: NSButton!
     private var reloadButton: NSButton!
+    private var bookmarkButton: NSButton!
+    private var bookmarksMenu: NSMenu!
     private var tabs: [BrowserTab] = []
     private var selectedTabID: UUID?
     private var updaterController: SPUStandardUpdaterController!
     private var recentSearches: [SearchKey: CachedSearch] = [:]
+    private var bookmarks: [Bookmark] = []
+    private var pendingSessionSave: DispatchWorkItem?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         updaterController = SPUStandardUpdaterController(
@@ -196,9 +227,14 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
             updaterDelegate: nil,
             userDriverDelegate: nil
         )
+        loadBookmarks()
         configureMenu()
         createWindow()
-        _ = createTab(initialURL: nil)
+        restoreSession()
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        saveSession()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
@@ -323,6 +359,8 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         addressField.toolTip = "Search Nova or enter a website address"
         addressField.isBordered = false
         addressField.drawsBackground = false
+        bookmarkButton = makeSymbolButton("star", tooltip: "Bookmark this page", action: #selector(toggleCurrentBookmark))
+        bookmarkButton.isEnabled = false
         let addressContainer = NSView()
         addressContainer.translatesAutoresizingMaskIntoConstraints = false
         addressContainer.wantsLayer = true
@@ -331,12 +369,15 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         addressContainer.layer?.borderColor = NSColor.white.withAlphaComponent(0.1).cgColor
         addressContainer.layer?.backgroundColor = NSColor(srgbRed: 0.14, green: 0.16, blue: 0.24, alpha: 1).cgColor
         addressContainer.addSubview(addressField)
+        addressContainer.addSubview(bookmarkButton)
         NSLayoutConstraint.activate([
             addressContainer.heightAnchor.constraint(equalToConstant: 34),
             addressField.leadingAnchor.constraint(equalTo: addressContainer.leadingAnchor, constant: 8),
-            addressField.trailingAnchor.constraint(equalTo: addressContainer.trailingAnchor, constant: -8),
+            addressField.trailingAnchor.constraint(equalTo: bookmarkButton.leadingAnchor, constant: -4),
             addressField.centerYAnchor.constraint(equalTo: addressContainer.centerYAnchor),
-            addressField.heightAnchor.constraint(equalToConstant: 23)
+            addressField.heightAnchor.constraint(equalToConstant: 23),
+            bookmarkButton.trailingAnchor.constraint(equalTo: addressContainer.trailingAnchor, constant: -4),
+            bookmarkButton.centerYAnchor.constraint(equalTo: addressContainer.centerYAnchor)
         ])
 
         let brand = NSTextField(labelWithString: "✦  NOVA")
@@ -369,7 +410,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         return button
     }
 
-    private func createTab(initialURL: URL?, select: Bool = true) -> BrowserTab {
+    private func createTab(
+        entry: SessionEntry = SessionEntry(kind: .home, value: nil),
+        select: Bool = true,
+        loadImmediately: Bool = true
+    ) -> BrowserTab {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
         configuration.userContentController.add(self, name: "novaNavigate")
@@ -408,8 +453,8 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         itemView.widthAnchor.constraint(equalToConstant: 208).isActive = true
         itemView.heightAnchor.constraint(equalToConstant: 29).isActive = true
 
-        let tab = BrowserTab(id: id, webView: webView, button: tabButton, closeButton: closeButton, itemView: itemView)
-        tab.isInternalPage = initialURL == nil
+        let tab = BrowserTab(id: id, webView: webView, button: tabButton, closeButton: closeButton, itemView: itemView, sessionEntry: entry)
+        tab.isInternalPage = entry.kind != .website
         tab.progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] webView, _ in
             DispatchQueue.main.async { self?.updateProgress(for: webView) }
         }
@@ -424,16 +469,14 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         tabBar.insertArrangedSubview(itemView, at: max(0, tabBar.arrangedSubviews.count - 1))
 
         if select { selectTab(tab) }
-        if let initialURL {
-            webView.load(URLRequest(url: initialURL))
-        } else {
-            webView.loadHTMLString(NovaOS.newTabHTML, baseURL: nil)
-        }
+        else if loadImmediately { loadTabIfNeeded(tab) }
+        scheduleSessionSave()
         return tab
     }
 
     private func selectTab(_ tab: BrowserTab) {
         selectedTabID = tab.id
+        loadTabIfNeeded(tab)
         contentHost.subviews.forEach { $0.removeFromSuperview() }
         tab.webView.translatesAutoresizingMaskIntoConstraints = false
         contentHost.addSubview(tab.webView)
@@ -448,6 +491,31 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         progressIndicator.isHidden = !tab.webView.isLoading
         updateNavigationButtons()
         updateTab(tab)
+        scheduleSessionSave()
+    }
+
+    private func loadTabIfNeeded(_ tab: BrowserTab) {
+        guard !tab.hasLoaded else { return }
+        tab.hasLoaded = true
+        switch tab.sessionEntry.kind {
+        case .home:
+            tab.isInternalPage = true
+            tab.webView.loadHTMLString(NovaOS.newTabHTML, baseURL: nil)
+        case .search:
+            let query = tab.sessionEntry.value ?? ""
+            tab.isInternalPage = true
+            tab.webView.loadHTMLString(NovaOS.searchHTML(query: query, cached: cachedResults(for: query)), baseURL: nil)
+        case .website:
+            guard let rawURL = tab.sessionEntry.value, let url = URL(string: rawURL),
+                  ["https", "http"].contains(url.scheme?.lowercased() ?? "") else {
+                tab.sessionEntry = SessionEntry(kind: .home, value: nil)
+                tab.isInternalPage = true
+                tab.webView.loadHTMLString(NovaOS.newTabHTML, baseURL: nil)
+                return
+            }
+            tab.isInternalPage = false
+            tab.webView.load(URLRequest(url: url))
+        }
     }
 
     private var selectedTab: BrowserTab? {
@@ -474,6 +542,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
             window.title = title == NovaOS.appName || title.hasSuffix(" — \(NovaOS.appName)") ? title : "\(title) — \(NovaOS.appName)"
             addressField.stringValue = displayAddress(for: tab.webView)
             updateNavigationButtons()
+            updateBookmarkButton()
         }
         updateTabStyles()
     }
@@ -517,13 +586,17 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         guard let destination = NovaNavigation.resolve(text) else { return }
         switch destination {
         case .search(let input):
+            tab.sessionEntry = SessionEntry(kind: .search, value: input)
             tab.isInternalPage = true
             tab.webView.loadHTMLString(NovaOS.searchHTML(query: input, cached: cachedResults(for: input)), baseURL: nil)
         case .website(let url):
+            tab.sessionEntry = SessionEntry(kind: .website, value: url.absoluteString)
             tab.isInternalPage = false
             if tab.id == selectedTabID { addressField.stringValue = url.absoluteString }
             tab.webView.load(URLRequest(url: url))
         }
+        tab.hasLoaded = true
+        scheduleSessionSave()
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -535,6 +608,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
                   let query = body["query"] as? String, let type = body["type"] as? String,
                   let data = body["data"] as? [String: Any] {
             rememberResults(data, query: query, type: type)
+            scheduleSessionSave()
         }
     }
 
@@ -562,6 +636,92 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
             recentSearches.removeValue(forKey: oldest)
         }
         recentSearches[key] = CachedSearch(data: data, time: now)
+    }
+
+    private func restoreSession() {
+        guard let data = UserDefaults.standard.data(forKey: Self.sessionDefaultsKey),
+              let saved = try? JSONDecoder().decode(SavedSession.self, from: data), !saved.tabs.isEmpty else {
+            _ = createTab()
+            return
+        }
+        for originalEntry in saved.tabs {
+            var entry = originalEntry
+            switch entry.kind {
+            case .home:
+                entry.value = nil
+                entry.cached = []
+            case .search:
+                guard let query = entry.value, !query.isEmpty, query.utf8.count <= 2048 else {
+                    entry = SessionEntry(kind: .home, value: nil)
+                    continue
+                }
+                entry.cached = entry.cached.filter { savedResult in
+                    guard Date().timeIntervalSince(savedResult.savedAt) < 300,
+                          ["all", "images", "videos", "news"].contains(savedResult.type),
+                          savedResult.data.count <= 64_000,
+                          let object = try? JSONSerialization.jsonObject(with: savedResult.data) as? [String: Any],
+                          let results = object["results"] as? [Any], !results.isEmpty else { return false }
+                    recentSearches[SearchKey(query: query, type: savedResult.type)] = CachedSearch(
+                        data: object,
+                        time: savedResult.savedAt
+                    )
+                    return true
+                }
+            case .website:
+                if let rawURL = entry.value, let url = URL(string: rawURL),
+                   ["https", "http"].contains(url.scheme?.lowercased() ?? "") {
+                    entry.value = url.absoluteString
+                } else {
+                    entry = SessionEntry(kind: .home, value: nil)
+                }
+                entry.cached = []
+            }
+            _ = createTab(entry: entry, select: false, loadImmediately: false)
+        }
+        guard !tabs.isEmpty else {
+            _ = createTab()
+            return
+        }
+        let active = tabs[min(max(saved.selectedIndex, 0), tabs.count - 1)]
+        selectTab(active)
+    }
+
+    private func scheduleSessionSave() {
+        pendingSessionSave?.cancel()
+        let work = DispatchWorkItem { [weak self] in self?.saveSession() }
+        pendingSessionSave = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45, execute: work)
+    }
+
+    private func saveSession() {
+        pendingSessionSave?.cancel()
+        pendingSessionSave = nil
+        guard !tabs.isEmpty else { return }
+        let selectedID = selectedTabID
+        let selectedOriginalIndex = tabs.firstIndex { $0.id == selectedID } ?? 0
+        let start = max(0, tabs.count - 25)
+        var retained = Array(tabs.suffix(25))
+        if selectedOriginalIndex < start {
+            retained[0] = tabs[selectedOriginalIndex]
+        }
+        let selectedIndex = retained.firstIndex { $0.id == selectedID } ?? 0
+        let entries = retained.map { tab -> SessionEntry in
+            var entry = tab.sessionEntry
+            entry.cached = []
+            if entry.kind == .search, let query = entry.value {
+                entry.cached = recentSearches.compactMap { key, value in
+                    guard key.query == query,
+                          Date().timeIntervalSince(value.time) < 300,
+                          let bytes = try? JSONSerialization.data(withJSONObject: value.data),
+                          bytes.count <= 64_000 else { return nil }
+                    return SavedSearchResult(type: key.type, data: bytes, savedAt: value.time)
+                }
+            }
+            return entry
+        }
+        let state = SavedSession(tabs: entries, selectedIndex: selectedIndex)
+        guard let data = try? JSONEncoder().encode(state) else { return }
+        UserDefaults.standard.set(data, forKey: Self.sessionDefaultsKey)
     }
 
     private func configureMenu() {
@@ -607,6 +767,12 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         fileMenuItem.submenu = fileMenu
         mainMenu.addItem(fileMenuItem)
 
+        let bookmarksItem = NSMenuItem(title: "Bookmarks", action: nil, keyEquivalent: "")
+        bookmarksMenu = NSMenu(title: "Bookmarks")
+        bookmarksMenu.delegate = self
+        bookmarksItem.submenu = bookmarksMenu
+        mainMenu.addItem(bookmarksItem)
+
         let editMenuItem = NSMenuItem(title: "Edit", action: nil, keyEquivalent: "")
         let editMenu = NSMenu(title: "Edit")
         editMenu.addItem(NSMenuItem(title: "Undo", action: NSSelectorFromString("undo:"), keyEquivalent: "z"))
@@ -622,8 +788,111 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         NSApp.mainMenu = mainMenu
     }
 
+    func menuNeedsUpdate(_ menu: NSMenu) {
+        guard menu === bookmarksMenu else { return }
+        menu.removeAllItems()
+        let addItem = NSMenuItem(title: isCurrentPageBookmarked ? "Remove Bookmark" : "Bookmark This Page", action: #selector(toggleCurrentBookmark), keyEquivalent: "d")
+        addItem.target = self
+        addItem.isEnabled = currentBookmarkURL != nil
+        menu.addItem(addItem)
+        if !bookmarks.isEmpty {
+            menu.addItem(.separator())
+            for bookmark in bookmarks.reversed() {
+                let item = NSMenuItem(title: bookmark.title, action: #selector(openBookmark(_:)), keyEquivalent: "")
+                item.target = self
+                item.representedObject = bookmark.url
+                item.toolTip = bookmark.url
+                menu.addItem(item)
+            }
+            menu.addItem(.separator())
+            let manageItem = NSMenuItem(title: "Manage Bookmarks…", action: #selector(manageBookmarks), keyEquivalent: "")
+            manageItem.target = self
+            menu.addItem(manageItem)
+        }
+    }
+
+    private var currentBookmarkURL: URL? {
+        guard let tab = selectedTab, !tab.isInternalPage, let url = tab.webView.url,
+              ["https", "http"].contains(url.scheme?.lowercased() ?? "") else { return nil }
+        return url
+    }
+
+    private var isCurrentPageBookmarked: Bool {
+        guard let url = currentBookmarkURL else { return false }
+        return bookmarks.contains { $0.url == url.absoluteString }
+    }
+
+    private func updateBookmarkButton() {
+        let url = currentBookmarkURL
+        bookmarkButton?.isEnabled = url != nil
+        bookmarkButton?.image = NSImage(
+            systemSymbolName: isCurrentPageBookmarked ? "star.fill" : "star",
+            accessibilityDescription: isCurrentPageBookmarked ? "Remove bookmark" : "Bookmark this page"
+        )
+        bookmarkButton?.toolTip = isCurrentPageBookmarked ? "Remove bookmark" : "Bookmark this page"
+        bookmarkButton?.contentTintColor = isCurrentPageBookmarked
+            ? NSColor(srgbRed: 0.93, green: 0.79, blue: 1, alpha: 1)
+            : NSColor(srgbRed: 0.75, green: 0.78, blue: 0.96, alpha: 1)
+    }
+
+    @objc private func toggleCurrentBookmark() {
+        guard let tab = selectedTab, let url = currentBookmarkURL else { return }
+        if let existing = bookmarks.firstIndex(where: { $0.url == url.absoluteString }) {
+            bookmarks.remove(at: existing)
+        } else {
+            let title = tab.webView.title?.trimmingCharacters(in: .whitespacesAndNewlines)
+            bookmarks.append(Bookmark(
+                id: UUID(),
+                title: title.flatMap { $0.isEmpty ? nil : $0 } ?? url.host ?? url.absoluteString,
+                url: url.absoluteString
+            ))
+        }
+        saveBookmarks()
+        updateBookmarkButton()
+    }
+
+    @objc private func openBookmark(_ sender: NSMenuItem) {
+        guard let rawURL = sender.representedObject as? String, let tab = selectedTab else { return }
+        navigate(rawURL, in: tab)
+    }
+
+    @objc private func manageBookmarks() {
+        guard !bookmarks.isEmpty else { return }
+        let chooser = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 320, height: 28), pullsDown: false)
+        for bookmark in bookmarks {
+            chooser.addItem(withTitle: bookmark.title)
+            chooser.lastItem?.representedObject = bookmark.id.uuidString
+        }
+        let alert = NSAlert()
+        alert.messageText = "Manage Nova Bookmarks"
+        alert.informativeText = "Choose a bookmark to remove."
+        alert.accessoryView = chooser
+        alert.addButton(withTitle: "Remove")
+        alert.addButton(withTitle: "Cancel")
+        guard alert.runModal() == .alertFirstButtonReturn,
+              let id = chooser.selectedItem?.representedObject as? String,
+              let index = bookmarks.firstIndex(where: { $0.id.uuidString == id }) else { return }
+        bookmarks.remove(at: index)
+        saveBookmarks()
+        updateBookmarkButton()
+    }
+
+    private func loadBookmarks() {
+        guard let data = UserDefaults.standard.data(forKey: Self.bookmarksDefaultsKey),
+              let saved = try? JSONDecoder().decode([Bookmark].self, from: data) else { return }
+        bookmarks = saved.filter { bookmark in
+            guard let url = URL(string: bookmark.url) else { return false }
+            return ["https", "http"].contains(url.scheme?.lowercased() ?? "")
+        }
+    }
+
+    private func saveBookmarks() {
+        guard let data = try? JSONEncoder().encode(bookmarks) else { return }
+        UserDefaults.standard.set(data, forKey: Self.bookmarksDefaultsKey)
+    }
+
     @objc private func newTab() {
-        _ = createTab(initialURL: nil)
+        _ = createTab()
     }
 
     @objc private func selectTabFromButton(_ sender: NSButton) {
@@ -642,7 +911,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
     private func closeTab(id: String?) {
         guard let tab = tab(id: id), let index = tabs.firstIndex(where: { $0.id == tab.id }) else { return }
         guard tabs.count > 1 else {
-            tab.webView.load(URLRequest(url: NovaOS.homeURL))
+            tab.sessionEntry = SessionEntry(kind: .home, value: nil)
+            tab.isInternalPage = true
+            tab.hasLoaded = true
+            tab.webView.loadHTMLString(NovaOS.newTabHTML, baseURL: nil)
+            scheduleSessionSave()
             return
         }
 
@@ -654,6 +927,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
             let nextTab = tabs[min(index, tabs.count - 1)]
             selectTab(nextTab)
         }
+        scheduleSessionSave()
     }
 
     @objc private func goBack() {
@@ -708,6 +982,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         guard let tab = tab(for: webView) else { return }
+        if !tab.isInternalPage, let url = webView.url,
+           ["https", "http"].contains(url.scheme?.lowercased() ?? "") {
+            tab.sessionEntry = SessionEntry(kind: .website, value: url.absoluteString)
+            scheduleSessionSave()
+        }
         updateTab(tab)
         updateNavigationButtons()
         if tab.id == selectedTabID {
@@ -740,7 +1019,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
 
         let scheme = url.scheme?.lowercased() ?? ""
         if scheme == "http" || scheme == "https" {
-            if navigationAction.targetFrame?.isMainFrame != false { tab(for: webView)?.isInternalPage = false }
+            if navigationAction.targetFrame?.isMainFrame != false, let tab = tab(for: webView) {
+                tab.isInternalPage = false
+                tab.sessionEntry = SessionEntry(kind: .website, value: url.absoluteString)
+                scheduleSessionSave()
+            }
             decisionHandler(.allow)
         } else if scheme == "about" && url.absoluteString == "about:blank" {
             if navigationAction.targetFrame?.isMainFrame != false { tab(for: webView)?.isInternalPage = true }
@@ -757,6 +1040,6 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDe
         windowFeatures: WKWindowFeatures
     ) -> WKWebView? {
         guard navigationAction.targetFrame == nil else { return nil }
-        return createTab(initialURL: nil).webView
+        return createTab().webView
     }
 }
