@@ -13,9 +13,9 @@ ICON_PNG="$BUILD_DIR/AppIcon-1024.png"
 ICON_ICNS="$BUILD_DIR/AppIcon.icns"
 KEY="$ROOT/.secrets/sparkle-ed25519.private"
 UPDATES="$ROOT/updates"
-APPCAST_URL_PREFIX="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/"
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$ROOT/Info.plist")"
 BUILD_NUMBER="$(/usr/libexec/PlistBuddy -c 'Print CFBundleVersion' "$ROOT/Info.plist")"
+APPCAST_URL_PREFIX="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v$VERSION/"
 UPDATER_ZIP="$UPDATES/Nova OS $VERSION-build$BUILD_NUMBER.zip"
 
 export SWIFT_MODULE_CACHE_PATH="$BUILD_DIR/SwiftModuleCache"
@@ -106,9 +106,9 @@ ditto -c -k --sequesterRsrc --keepParent "$OUTPUT" "$UPDATER_ZIP"
 cat > "$UPDATES/Nova OS $VERSION.html" <<HTML
 <h2>Nova OS $VERSION</h2>
 <ul>
-  <li>Signed automatic updates are enabled through Sparkle.</li>
-  <li>Open tabs and bookmarks are saved on your Mac.</li>
-  <li>Recent results return instantly when you reopen a search tab.</li>
+  <li>Nova AI Overviews summarize search results with source links.</li>
+  <li>The address bar suggests recent pages, searches, and bookmarks.</li>
+  <li>Browsing history and a progress-aware Downloads menu are included.</li>
 </ul>
 HTML
 

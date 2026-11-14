@@ -36,9 +36,9 @@ ET.SubElement(item, f"{{{sparkle_ns}}}minimumSystemVersion").text = "13.0.0"
 description_html = (
     "<h2>New in Nova OS " + short_version + "</h2>"
     "<ul>"
-    "<li>Signed automatic updates are enabled through Sparkle.</li>"
-    "<li>Open tabs and bookmarks are saved on your Mac.</li>"
-    "<li>Recent results return instantly when you reopen a search tab.</li>"
+    "<li>Nova AI Overviews summarize search results with source links.</li>"
+    "<li>The address bar suggests recent pages, searches, and bookmarks.</li>"
+    "<li>Browsing history and a progress-aware Downloads menu are included.</li>"
     "</ul>"
 )
 ET.SubElement(item, "description").text = "NOVA_RELEASE_NOTES"

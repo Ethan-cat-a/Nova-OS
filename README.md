@@ -5,10 +5,10 @@
   <p>
     <img src="https://img.shields.io/badge/macOS-13%2B-5967e8?style=for-the-badge&logo=apple&logoColor=white" alt="macOS 13 or later" />
     <img src="https://img.shields.io/badge/Apple_Silicon-Intel-7654df?style=for-the-badge" alt="Apple Silicon and Intel" />
-    <img src="https://img.shields.io/badge/version-1.1.5-172146?style=for-the-badge" alt="Version 1.1.5" />
+    <img src="https://img.shields.io/badge/version-1.1.6-172146?style=for-the-badge" alt="Version 1.1.6" />
   </p>
   <p>
-    <a href="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/downloads/Nova%20OS%20Installer.pkg"><strong>↓ Download Nova OS 1.1.5 for Mac</strong></a>
+    <a href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.1.6/Nova%20OS%20Installer.pkg"><strong>↓ Download Nova OS 1.1.6 for Mac</strong></a>
     &nbsp; · &nbsp;
     <a href="https://nova-os-browser.vercel.app/">Open the web version</a>
   </p>
@@ -27,7 +27,11 @@ Nova OS for Mac brings the live Nova OS site into a native macOS window and incl
 
 Nova remembers up to 25 open tabs and restores them the next time you launch it. Inactive tabs wait to load until you select them, so reopening a session doesn't start every site at once. Save and remove bookmarks with the star in the address bar, then open them from the **Bookmarks** menu.
 
+The address bar suggests recent pages, searches, and bookmarks as you type. The **History** menu keeps the 100 most recent pages and searches on this Mac; clear it at any time from that menu.
+
 The browser uses macOS WebKit and includes back, forward, reload, and Nova OS home controls, a thin page-loading indicator, and familiar Mac shortcuts. It does not require Google Chrome. Nova Search includes All, Images, Videos, and News views and uses the Nova OS search service, which currently provides results from Bing.
+
+All-results searches include a Nova AI Overview with source links and a Google results link. Nova sends the search topic and up to five result snippets to the Nova AI service to create the overview. The **Downloads** button shows progress, opens completed files in Finder, and keeps them in your Downloads folder.
 
 Search results stay in memory for five minutes. Results for searches in open tabs are also saved with the session, so those pages can reopen immediately after you restart Nova. A new, uncached search still depends on the search service and your connection.
 
@@ -40,11 +44,11 @@ The **Nova OS** app menu includes the start page, new tab, and update controls. 
 
 ## Automatic updates
 
-Nova OS checks for updates daily and installs signed releases with Sparkle. Existing installations can choose **Nova OS → Check for Updates…** to get version 1.1.5; fresh installations can use the package below. Later signed releases install automatically.
+Nova OS checks for updates daily and installs signed releases with Sparkle. Existing installations can choose **Nova OS → Check for Updates…** to get version 1.1.6; fresh installations can use the package below. Later signed releases install automatically.
 
 ## Install
 
-1. Download **Nova OS 1.1.5 for Mac** above.
+1. Download **Nova OS 1.1.6 for Mac** above.
 2. Open `Nova OS Installer.pkg` and follow the macOS Installer steps.
 3. Find **Nova OS** in `/Applications`.
 
@@ -58,6 +62,6 @@ On a Mac with Xcode Command Line Tools installed:
 ./build.sh
 ```
 
-The script creates `dist/Nova OS.app`, `dist/Nova OS Installer.pkg`, a signed Sparkle update archive under `updates/`, and its appcast. The first build requires network access to resolve Sparkle.
+The script creates `dist/Nova OS.app`, `dist/Nova OS Installer.pkg`, a signed Sparkle update archive under `updates/`, and its appcast. To publish a release, attach the installer and update archive to the matching GitHub release tag; the appcast links to those release assets. The first build requires network access to resolve Sparkle.
 
 The Sparkle signing private key lives in the ignored `.secrets/` directory and is never included in Git. Keep a secure backup of that key: future update archives must use the matching key. The matching public key is embedded in `Info.plist`.
