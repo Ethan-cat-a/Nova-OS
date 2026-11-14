@@ -3,7 +3,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 OUTPUT="${1:-$ROOT/dist/Nova OS.app}"
-PACKAGE="${OUTPUT%.app} Installer.pkg"
+APP_BASENAME="$(basename "$OUTPUT" .app | tr ' ' '-')"
+PACKAGE="$(dirname "$OUTPUT")/${APP_BASENAME}-Installer.pkg"
 BUILD_DIR="$ROOT/build"
 SPM_DIR="$BUILD_DIR/SwiftPM"
 CONTENTS="$OUTPUT/Contents"
@@ -16,7 +17,7 @@ UPDATES="$ROOT/updates"
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$ROOT/Info.plist")"
 BUILD_NUMBER="$(/usr/libexec/PlistBuddy -c 'Print CFBundleVersion' "$ROOT/Info.plist")"
 APPCAST_URL_PREFIX="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v$VERSION/"
-UPDATER_ZIP="$UPDATES/Nova OS $VERSION-build$BUILD_NUMBER.zip"
+UPDATER_ZIP="$UPDATES/Nova-OS-$VERSION-build$BUILD_NUMBER.zip"
 
 export SWIFT_MODULE_CACHE_PATH="$BUILD_DIR/SwiftModuleCache"
 export CLANG_MODULE_CACHE_PATH="$BUILD_DIR/ClangModuleCache"

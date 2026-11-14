@@ -12,7 +12,7 @@
       <sparkle:shortVersionString>1.1.6</sparkle:shortVersionString>
       <sparkle:minimumSystemVersion>13.0.0</sparkle:minimumSystemVersion>
       <description><![CDATA[<h2>New in Nova OS 1.1.6</h2><ul><li>Nova AI Overviews summarize search results with source links.</li><li>The address bar suggests recent pages, searches, and bookmarks.</li><li>Browsing history and a progress-aware Downloads menu are included.</li></ul>]]></description>
-      <enclosure url="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.1.6/Nova%20OS%201.1.6-build8.zip" length="3127561" type="application/octet-stream" sparkle:edSignature="WLyFpK49HNn/39Jk3Nin49PvJ6t8+bfCmBLLX1sKh1J6yObopuVrl5fAm/2mBnxNqY/xudxCGy1mcSH/rzZzBg==" />
+      <enclosure url="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.1.6/Nova.OS.1.1.6-build8.zip" length="3127561" type="application/octet-stream" sparkle:edSignature="WLyFpK49HNn/39Jk3Nin49PvJ6t8+bfCmBLLX1sKh1J6yObopuVrl5fAm/2mBnxNqY/xudxCGy1mcSH/rzZzBg==" />
     </item>
   </channel>
 </rss>

@@ -8,7 +8,7 @@
     <img src="https://img.shields.io/badge/version-1.1.6-172146?style=for-the-badge" alt="Version 1.1.6" />
   </p>
   <p>
-    <a href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.1.6/Nova%20OS%20Installer.pkg"><strong>↓ Download Nova OS 1.1.6 for Mac</strong></a>
+    <a href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.1.6/Nova.OS.Installer.pkg"><strong>↓ Download Nova OS 1.1.6 for Mac</strong></a>
     &nbsp; · &nbsp;
     <a href="https://nova-os-browser.vercel.app/">Open the web version</a>
   </p>
@@ -62,6 +62,6 @@ On a Mac with Xcode Command Line Tools installed:
 ./build.sh
 ```
 
-The script creates `dist/Nova OS.app`, `dist/Nova OS Installer.pkg`, a signed Sparkle update archive under `updates/`, and its appcast. To publish a release, attach the installer and update archive to the matching GitHub release tag; the appcast links to those release assets. The first build requires network access to resolve Sparkle.
+The script creates `dist/Nova OS.app`, `dist/Nova-OS-Installer.pkg`, a signed Sparkle update archive under `updates/`, and its appcast. To publish a release, attach the installer and update archive to the matching GitHub release tag; the appcast links to those release assets. The first build requires network access to resolve Sparkle.
 
 The Sparkle signing private key lives in the ignored `.secrets/` directory and is never included in Git. Keep a secure backup of that key: future update archives must use the matching key. The matching public key is embedded in `Info.plist`.
