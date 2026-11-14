@@ -16,7 +16,7 @@ KEY="$ROOT/.secrets/sparkle-ed25519.private"
 UPDATES="$ROOT/updates"
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "$ROOT/Info.plist")"
 BUILD_NUMBER="$(/usr/libexec/PlistBuddy -c 'Print CFBundleVersion' "$ROOT/Info.plist")"
-APPCAST_URL_PREFIX="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v$VERSION/"
+APPCAST_URL_PREFIX="https://raw.githubusercontent.com/Ethan-cat-a/Nova-OS/main/updates/"
 UPDATER_ZIP="$UPDATES/Nova-OS-$VERSION-build$BUILD_NUMBER.zip"
 
 export SWIFT_MODULE_CACHE_PATH="$BUILD_DIR/SwiftModuleCache"

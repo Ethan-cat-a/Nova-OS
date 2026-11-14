@@ -62,6 +62,6 @@ On a Mac with Xcode Command Line Tools installed:
 ./build.sh
 ```
 
-The script creates `dist/Nova OS.app`, `dist/Nova-OS-Installer.pkg`, a signed Sparkle update archive under `updates/`, and its appcast. To publish a release, attach the installer and update archive to the matching GitHub release tag; the appcast links to those release assets. The first build requires network access to resolve Sparkle.
+The script creates `dist/Nova OS.app`, `dist/Nova-OS-Installer.pkg`, a signed Sparkle update archive under `updates/`, and its appcast. To publish a release, commit the update archive under `updates/` and attach the installer to the matching GitHub release tag; the appcast downloads the archive directly from the repository. The first build requires network access to resolve Sparkle.
 
 The Sparkle signing private key lives in the ignored `.secrets/` directory and is never included in Git. Keep a secure backup of that key: future update archives must use the matching key. The matching public key is embedded in `Info.plist`.
