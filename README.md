@@ -11,6 +11,8 @@
     <a href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.1.7/Nova-OS-Installer.pkg"><strong>↓ Download Nova OS 1.1.7 Frost for Mac</strong></a>
     &nbsp; · &nbsp;
     <a href="https://nova-os-browser.vercel.app/">Open the web version</a>
+    &nbsp; · &nbsp;
+    <a href="https://nova-browser-frost.vercel.app/">NOVA Frost website</a>
   </p>
 </div>
 
