@@ -11,56 +11,107 @@ private enum NovaOS {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <link rel="preconnect" href="https://nova-os-browser.vercel.app" crossorigin>
+      <meta name="color-scheme" content="light dark">
       <title>New Tab — Nova OS</title>
       <style>
-        :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; }
+        :root {
+          color-scheme: light dark;
+          font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+          --background: #f7f7f9;
+          --foreground: #1d1d1f;
+          --secondary: #777780;
+          --muted: #92929b;
+          --surface: rgba(255,255,255,.82);
+          --tile: rgba(255,255,255,.66);
+          --border: rgba(35,35,50,.09);
+          --shadow: 0 12px 42px rgba(35,35,65,.06);
+          --accent: #6478d8;
+        }
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --background: #17181c;
+            --foreground: #f5f5f7;
+            --secondary: #b0b0ba;
+            --muted: #92929d;
+            --surface: rgba(48,49,56,.85);
+            --tile: rgba(255,255,255,.055);
+            --border: rgba(255,255,255,.09);
+            --shadow: 0 16px 50px rgba(0,0,0,.14);
+            --accent: #a1aaf8;
+          }
+        }
         * { box-sizing: border-box; }
-        body { margin: 0; min-height: 100vh; color: #f4f6ff; background: radial-gradient(ellipse at 50% -25%, #4057a459, transparent 53%), radial-gradient(ellipse at 95% 90%, #7152a91c, transparent 40%), #0c1120; display: grid; place-items: center; padding: 42px 24px; }
-        main { width: min(720px, 100%); text-align: center; margin-top: -3vh; }
-        .brand { display: inline-flex; align-items: center; gap: 10px; color: #c9d1ec; font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
-        .mark { width: 38px; height: 38px; border-radius: 13px; display: grid; place-items: center; color: white; background: linear-gradient(145deg,#85a9ff,#8164dc); box-shadow: 0 8px 26px #665ae344; font-size: 20px; }
-        h1 { margin: 24px 0 8px; font-size: clamp(34px, 5vw, 48px); line-height: 1.1; letter-spacing: -.045em; font-weight: 680; }
-        .subtitle { margin: 0; color: #a1acc8; font-size: 14px; }
-        form { margin: 31px auto 0; height: 58px; display: flex; align-items: center; gap: 13px; padding: 0 7px 0 18px; max-width: 660px; border-radius: 18px; background: #1c253b; border: 1px solid #96a8d63d; box-shadow: 0 18px 42px #0003; }
-        form:focus-within { border-color: #a39bff; box-shadow: 0 0 0 4px #8d83ff24, 0 18px 42px #0003; }
-        .search-icon { color: #a5b1ed; font-size: 20px; }
-        input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: white; font: inherit; font-size: 16px; }
-        input::placeholder { color: #9da4bd; }
-        button { border: 0; border-radius: 12px; padding: 12px 17px; color: white; background: linear-gradient(135deg,#728fff,#8b6ce2); font: inherit; font-size: 13px; font-weight: 650; cursor: pointer; }
-        button:hover { filter: brightness(1.12); }
-        .section-label { margin: 38px 0 14px; color: #8793b1; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; }
-        .links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; text-align: left; }
-        .link { display:flex; align-items:center; gap:10px; padding:13px; min-width:0; border-radius:15px; color:#f2f4ff; text-decoration:none; background:#ffffff09; border:1px solid #d5dcff18; transition:background .18s,border-color .18s; }
-        .link:hover { background:#ffffff12; border-color:#a9baff55; }
-        .link-icon { flex:none; width:34px; height:34px; border-radius:11px; display:grid; place-items:center; background:#879ffb26; color:#b6c3ff; font-weight:750; font-size:15px; }
-        .link strong { display:block; font-size:12px; font-weight:650; overflow:hidden; text-overflow:ellipsis; }
-        .link small { display:block; margin-top:4px; color:#8e9ab8; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-        footer { margin-top:40px; color:#7d89a5; font-size:11px; }
-        @media (max-width: 560px) { .links { grid-template-columns: repeat(2, 1fr); } form { height: 56px; } button { padding: 11px 13px; } }
+        body {
+          margin: 0; min-height: 100vh; display: grid; place-items: center;
+          background: var(--background); color: var(--foreground);
+          padding: 46px 24px; -webkit-font-smoothing: antialiased;
+        }
+        main { width: min(650px,100%); text-align: center; margin-top: -4vh; }
+        .mark {
+          display: grid; place-items: center; width: 54px; height: 54px;
+          margin: 0 auto 20px; border-radius: 17px;
+          color: #fff; font-size: 27px;
+          background: linear-gradient(145deg,#8da3f2,#727fdd);
+          box-shadow: 0 10px 30px rgba(100,120,216,.18);
+        }
+        .eyebrow { margin: 0; color: var(--secondary); font-size: 11px; font-weight: 650; letter-spacing: .14em; }
+        h1 { margin: 17px 0 6px; font-size: clamp(34px,5vw,46px); font-weight: 650; letter-spacing: -.055em; line-height: 1.15; }
+        .subtitle { margin: 0; color: var(--secondary); font-size: 14px; }
+        form {
+          display: flex; align-items: center; gap: 12px; height: 55px; max-width: 620px;
+          margin: 34px auto 0; padding: 0 18px; border-radius: 15px;
+          background: var(--surface); border: 1px solid var(--border);
+          box-shadow: var(--shadow); text-align: left;
+        }
+        form:focus-within { outline: 3px solid color-mix(in srgb, var(--accent) 18%, transparent); }
+        .search-icon { color: var(--muted); font-size: 22px; line-height: 1; }
+        input { flex: 1; min-width: 0; padding: 0; border: none; outline: none; background: transparent; color: var(--foreground); font: inherit; font-size: 15px; }
+        input::placeholder { color: var(--muted); }
+        .shortcut { flex: none; color: var(--muted); font-size: 11px; border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px; }
+        .section-heading { margin: 39px 0 16px; color: var(--secondary); font-size: 11px; font-weight: 600; text-align: left; }
+        .favorites { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; }
+        .favorite {
+          display: flex; flex-direction: column; align-items: center; gap: 10px;
+          padding: 17px 8px 13px; border: 1px solid transparent; border-radius: 16px;
+          text-decoration: none; color: var(--foreground); font-size: 12px;
+          transition: background .16s ease,border-color .16s ease,transform .16s ease;
+        }
+        .favorite:hover, .favorite:focus-visible { background: var(--tile); border-color: var(--border); transform: translateY(-2px); outline: none; }
+        .tile { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: 0 4px 18px rgba(0,0,0,.025); font-size: 22px; font-weight: 650; }
+        .tile.nova { color: #7588e0; }.tile.youtube { color: #f04c4c; }.tile.github { color: var(--foreground); }.tile.wiki { font-family: Georgia, serif; color: var(--foreground); }
+        footer { margin-top: 38px; color: var(--muted); font-size: 11px; }
+        @media (max-width: 500px) { main { margin-top: 0; } .favorites { gap: 4px; } .tile { width: 50px; height: 50px; } .shortcut { display: none; } }
+        @media (prefers-reduced-motion: reduce) { .favorite { transition: none; } }
       </style>
     </head>
     <body>
       <main>
-        <div class="brand"><span class="mark">✦</span> Nova OS</div>
-        <h1>Explore with Nova.</h1>
-        <p class="subtitle">Search the web, or pick up somewhere new.</p>
-        <form id="search"><span class="search-icon">⌕</span><input id="query" aria-label="Search Nova or enter a website" autofocus placeholder="Search Nova or enter a website" autocomplete="off"><button type="submit">Search</button></form>
-        <p class="section-label">Quick links</p>
-        <div class="links">
-          <a class="link" href="https://nova-os-browser.vercel.app/"><span class="link-icon">✦</span><span><strong>Nova OS</strong><small>Workspace</small></span></a>
-          <a class="link" href="https://www.youtube.com/"><span class="link-icon">▶</span><span><strong>YouTube</strong><small>Watch</small></span></a>
-          <a class="link" href="https://github.com/"><span class="link-icon">⌘</span><span><strong>GitHub</strong><small>Build</small></span></a>
-          <a class="link" href="https://en.wikipedia.org/"><span class="link-icon">W</span><span><strong>Wikipedia</strong><small>Discover</small></span></a>
-        </div>
-        <footer>⌘ L to search · ⌘ T for another tab</footer>
+        <div class="mark" aria-hidden="true">✦</div>
+        <p class="eyebrow">NOVA BROWSER</p>
+        <h1 id="greeting">A better place to explore.</h1>
+        <p class="subtitle">Your web, thoughtfully organized.</p>
+        <form id="search" role="search">
+          <span class="search-icon" aria-hidden="true">⌕</span>
+          <input id="query" aria-label="Search Nova or enter a website" placeholder="Search or enter a website" autofocus autocomplete="off">
+          <span class="shortcut" aria-hidden="true">⌘ L</span>
+        </form>
+        <p class="section-heading">Favorites</p>
+        <nav class="favorites" aria-label="Favorite websites">
+          <a class="favorite" href="https://nova-os-browser.vercel.app/"><span class="tile nova">✦</span><span>NOVA OS</span></a>
+          <a class="favorite" href="https://www.youtube.com/"><span class="tile youtube">▶</span><span>YouTube</span></a>
+          <a class="favorite" href="https://github.com/"><span class="tile github">⌘</span><span>GitHub</span></a>
+          <a class="favorite" href="https://en.wikipedia.org/"><span class="tile wiki">W</span><span>Wikipedia</span></a>
+        </nav>
+        <footer>Designed for a quieter way to browse.</footer>
       </main>
       <script>
+        const hour = new Date().getHours();
+        document.getElementById('greeting').textContent =
+          hour < 12 ? 'Good morning.' : hour < 17 ? 'Good afternoon.' : 'Good evening.';
         document.getElementById('search').addEventListener('submit', event => {
           event.preventDefault();
           const query = document.getElementById('query').value.trim();
-          if (!query) return;
-          window.webkit.messageHandlers.novaNavigate.postMessage(query);
+          if (query) window.webkit.messageHandlers.novaNavigate.postMessage(query);
         });
       </script>
     </body>
@@ -103,6 +154,38 @@ private enum NovaOS {
     #results.grid{max-width:950px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px}#results.grid .result{padding:0;margin:0;border:0}#results.grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;background:#ffffff0a}#results.grid .title{font-size:14px;line-height:1.4;margin:7px 0}#results.grid .site{font-size:11px}#results.grid .site-icon{width:22px;height:22px;border-radius:7px}
     #results.videos .result{display:flex;gap:18px;align-items:flex-start}#results.videos img{width:180px;aspect-ratio:16/9;object-fit:cover;border-radius:14px;background:#ffffff0a}#results.videos .details{flex:1;min-width:0}
     @media(max-width:650px){.top{padding:18px 16px 10px;gap:12px;flex-wrap:wrap}.brand{width:100%}form{width:100%}nav{padding:0 12px}nav button{padding:14px 12px}main{padding:24px 18px 60px}#results.videos img{width:110px}}
+    /* Frost search styling: keep the working search UI, follow the macOS theme. */
+    :root{color-scheme:light dark}
+    body{background:#17181c}
+    header{background:rgba(30,31,37,.94);border-bottom:1px solid #ffffff17}
+    form{border-radius:14px;background:rgba(255,255,255,.065);border-color:#ffffff1b;box-shadow:none}
+    form:focus-within{border-color:#a3aaf2;box-shadow:0 0 0 3px #9da9e32b}
+    .submit{background:#788be5;border-radius:10px}
+    .overview{background:#21232c;border-color:#ffffff15;box-shadow:none}
+    .result{border-bottom-color:#ffffff12}
+    .title{color:#b7c4ff}
+    @media(prefers-color-scheme:light){
+      body{background:#fbfbfd;color:#1d1d1f}
+      header{background:rgba(248,248,250,.96);border-bottom-color:#dedee5}
+      .brand{color:#292930}
+      .mark{background:linear-gradient(145deg,#8ea3f2,#7886e0);box-shadow:none}
+      form{background:rgba(255,255,255,.9);border-color:#dedee5;box-shadow:0 3px 15px #17172707}
+      input{color:#1d1d1f}
+      .search-icon,.summary,.provider{color:#767683}
+      nav button{color:#747482}
+      nav button:hover,nav button[aria-selected="true"]{color:#5568c4}
+      nav button[aria-selected="true"]:after{background:#7184dc}
+      .site{color:#777784}
+      .title{color:#425ec7}
+      .snippet{color:#5e5e69}
+      .result{border-bottom-color:#e7e7ec}
+      .overview{background:#f2f3fa;border-color:#e1e2ee;box-shadow:none}
+      .overview-copy{color:#2c2d37}
+      .overview-subtitle,.overview-note{color:#747888}
+      .overview-sources a,.overview-google{color:#5367bb;border-color:#d7d9e7}
+      .overview-sources a:hover,.overview-google:hover{background:#e5e8f5}
+      .status{color:#666674}
+    }
     </style></head><body><header><div class="top"><div class="brand"><span class="mark">✦</span>NOVA</div><form id="search"><span class="search-icon">⌕</span><input id="query" aria-label="Search Nova or enter a website" placeholder="Search Nova or enter a website"><button class="submit">Search</button></form></div>
     <nav aria-label="Search categories"><button type="button" data-type="all" aria-selected="true">✦ &nbsp;All</button><button type="button" data-type="images" aria-selected="false">▧ &nbsp;Images</button><button type="button" data-type="videos" aria-selected="false">▷ &nbsp;Videos</button><button type="button" data-type="news" aria-selected="false">▤ &nbsp;News</button></nav></header>
     <main><p class="summary" id="summary">Searching with Nova…</p><section class="overview" id="overview" hidden aria-live="polite"></section><section id="results" aria-live="polite"></section><p class="provider" id="provider"></p></main>
@@ -162,12 +245,39 @@ private struct NovaOSMacApp {
 }
 
 @MainActor
+private final class FrostTabStackView: NSStackView {
+    var isActiveTab = false {
+        didSet { needsDisplay = true }
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        needsDisplay = true
+    }
+
+    override func draw(_ dirtyRect: NSRect) {
+        super.draw(dirtyRect)
+        let shape = NSBezierPath(roundedRect: bounds.insetBy(dx: 1, dy: 1), xRadius: 9, yRadius: 9)
+        if isActiveTab {
+            NSColor.controlAccentColor.withAlphaComponent(0.14).setFill()
+            shape.fill()
+            NSColor.controlAccentColor.withAlphaComponent(0.20).setStroke()
+            shape.lineWidth = 1
+            shape.stroke()
+        } else {
+            NSColor.labelColor.withAlphaComponent(0.035).setFill()
+            shape.fill()
+        }
+    }
+}
+
+@MainActor
 private final class BrowserTab {
     let id: UUID
     let webView: WKWebView
     let button: NSButton
     let closeButton: NSButton
-    let itemView: NSStackView
+    let itemView: FrostTabStackView
     var progressObservation: NSKeyValueObservation?
     var titleObservation: NSKeyValueObservation?
     var isInternalPage = false
@@ -177,7 +287,7 @@ private final class BrowserTab {
     var faviconURLString: String?
     var faviconRequestID: UUID?
 
-    init(id: UUID, webView: WKWebView, button: NSButton, closeButton: NSButton, itemView: NSStackView, sessionEntry: SessionEntry) {
+    init(id: UUID, webView: WKWebView, button: NSButton, closeButton: NSButton, itemView: FrostTabStackView, sessionEntry: SessionEntry) {
         self.id = id
         self.webView = webView
         self.button = button
@@ -302,8 +412,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             defer: false
         )
         window.title = NovaOS.appName
-        window.appearance = NSAppearance(named: .darkAqua)
-        window.backgroundColor = NSColor(srgbRed: 0.055, green: 0.065, blue: 0.13, alpha: 1)
+        window.appearance = nil // Follow the user’s system Light/Dark setting.
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.backgroundColor = .windowBackgroundColor
         window.minSize = NSSize(width: 820, height: 600)
         window.center()
 
@@ -322,10 +434,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         tabScrollView.borderType = .noBorder
 
         let newTabButton = makeSymbolButton("plus", tooltip: "New Tab", action: #selector(newTab))
-        let tabStrip = NSView()
+        let tabStrip = NSVisualEffectView()
+        tabStrip.material = .titlebar
+        tabStrip.blendingMode = .withinWindow
+        tabStrip.state = .followsWindowActiveState
         tabStrip.translatesAutoresizingMaskIntoConstraints = false
-        tabStrip.wantsLayer = true
-        tabStrip.layer?.backgroundColor = NSColor(srgbRed: 0.075, green: 0.085, blue: 0.155, alpha: 1).cgColor
         tabStrip.addSubview(tabScrollView)
         tabBar.addArrangedSubview(newTabButton)
         NSLayoutConstraint.activate([
@@ -342,9 +455,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
 
         let navigationBar = makeNavigationBar()
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
-        let chrome = NSView()
-        chrome.wantsLayer = true
-        chrome.layer?.backgroundColor = NSColor(srgbRed: 0.095, green: 0.105, blue: 0.18, alpha: 1).cgColor
+        let chrome = NSVisualEffectView()
+        chrome.material = .headerView
+        chrome.blendingMode = .withinWindow
+        chrome.state = .followsWindowActiveState
         chrome.translatesAutoresizingMaskIntoConstraints = false
         chrome.addSubview(tabStrip)
         chrome.addSubview(navigationBar)
@@ -420,13 +534,14 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         bookmarkButton.isEnabled = false
         downloadsButton = makeSymbolButton("arrow.down.circle", tooltip: "Downloads", action: #selector(showDownloadsMenu(_:)))
         configureAddressSuggestions()
-        let addressContainer = NSView()
+        let addressContainer = NSVisualEffectView()
+        addressContainer.material = .contentBackground
+        addressContainer.blendingMode = .withinWindow
+        addressContainer.state = .followsWindowActiveState
         addressContainer.translatesAutoresizingMaskIntoConstraints = false
         addressContainer.wantsLayer = true
-        addressContainer.layer?.cornerRadius = 11
-        addressContainer.layer?.borderWidth = 1
-        addressContainer.layer?.borderColor = NSColor.white.withAlphaComponent(0.1).cgColor
-        addressContainer.layer?.backgroundColor = NSColor(srgbRed: 0.14, green: 0.16, blue: 0.24, alpha: 1).cgColor
+        addressContainer.layer?.cornerRadius = 10
+        addressContainer.layer?.masksToBounds = true
         addressContainer.addSubview(addressField)
         addressContainer.addSubview(bookmarkButton)
         NSLayoutConstraint.activate([
@@ -441,7 +556,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
 
         let brand = NSTextField(labelWithString: "✦  NOVA")
         brand.font = NSFont.systemFont(ofSize: 11, weight: .bold)
-        brand.textColor = NSColor(srgbRed: 0.75, green: 0.73, blue: 1, alpha: 1)
+        brand.textColor = .secondaryLabelColor
         brand.setContentHuggingPriority(.required, for: .horizontal)
 
         let bar = NSStackView(views: [brand, backButton, forwardButton, reloadButton, homeButton, addressContainer, downloadsButton])
@@ -543,7 +658,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             button.bezelStyle = .recessed
             button.isBordered = false
             button.font = NSFont.systemFont(ofSize: 12, weight: .medium)
-            button.contentTintColor = NSColor(srgbRed: 0.81, green: 0.84, blue: 1, alpha: 1)
+            button.contentTintColor = .labelColor
             button.toolTip = suggestion.detail
             button.translatesAutoresizingMaskIntoConstraints = false
             button.heightAnchor.constraint(equalToConstant: 34).isActive = true
@@ -576,7 +691,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         button.translatesAutoresizingMaskIntoConstraints = false
         button.bezelStyle = .toolbar
         button.isBordered = false
-        button.contentTintColor = NSColor(srgbRed: 0.75, green: 0.78, blue: 0.96, alpha: 1)
+        button.contentTintColor = .secondaryLabelColor
         button.toolTip = tooltip
         button.setContentHuggingPriority(.required, for: .horizontal)
         button.widthAnchor.constraint(equalToConstant: 30).isActive = true
@@ -618,7 +733,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         closeButton.translatesAutoresizingMaskIntoConstraints = false
         closeButton.widthAnchor.constraint(equalToConstant: 24).isActive = true
 
-        let itemView = NSStackView(views: [tabButton, closeButton])
+        let itemView = FrostTabStackView(views: [tabButton, closeButton])
         itemView.orientation = .horizontal
         itemView.alignment = .centerY
         itemView.distribution = .fill
@@ -638,7 +753,6 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             }
         }
         itemView.identifier = NSUserInterfaceItemIdentifier(id.uuidString)
-        itemView.wantsLayer = true
         tabs.append(tab)
         tabBar.insertArrangedSubview(itemView, at: max(0, tabBar.arrangedSubviews.count - 1))
 
@@ -736,18 +850,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     private func updateTabStyles() {
         for tab in tabs {
             let selected = tab.id == selectedTabID
-            tab.itemView.layer?.cornerRadius = 10
-            tab.itemView.layer?.borderWidth = 1
-            tab.itemView.layer?.borderColor = (selected
-                ? NSColor(srgbRed: 0.62, green: 0.57, blue: 1, alpha: 0.55)
-                : NSColor.white.withAlphaComponent(0.05)).cgColor
-            tab.itemView.layer?.backgroundColor = (selected
-                ? NSColor(srgbRed: 0.37, green: 0.32, blue: 0.67, alpha: 0.7)
-                : NSColor.white.withAlphaComponent(0.045)).cgColor
+            tab.itemView.isActiveTab = selected
             tab.button.font = NSFont.systemFont(ofSize: 12, weight: selected ? .semibold : .medium)
             tab.button.isBordered = false
-            tab.button.contentTintColor = selected ? .white : NSColor(srgbRed: 0.72, green: 0.75, blue: 0.9, alpha: 1)
-            tab.closeButton.contentTintColor = NSColor(srgbRed: 0.75, green: 0.76, blue: 0.9, alpha: 1)
+            tab.button.contentTintColor = selected ? .labelColor : .secondaryLabelColor
+            tab.closeButton.contentTintColor = .tertiaryLabelColor
         }
     }
 
