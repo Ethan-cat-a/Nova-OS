@@ -20,6 +20,14 @@
 
 Nova OS for Mac brings the live Nova OS site into a native macOS window and includes a built-in browser for everyday websites.
 
+## NOVA Flow 1.3.0 (development)
+
+Flow is being built on a separate feature branch, not yet released. Planned
+features: ranked OmniSearch via Command-K, named local Spaces, visual tab gallery
+(Command-Shift-G), pinned/drag-reorderable tabs, and local Focus Reader (Command-Shift-R).
+The 1.2.0 download below remains the stable installer until Flow passes QA.
+See [Flow implementation and release plan](docs/Flow-1.3.0.md).
+
 ## NOVA Orbit — new in 1.2.0
 
 Orbit adds the Command-K palette for tabs, bookmarks, history and actions; WebKit Find in Page
