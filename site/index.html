@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f8f8f6">
+  <meta name="description" content="NOVA Browser for Mac. A calmer, more thoughtful way to explore the web. Native macOS, beautiful tabs, NOVA Search, and AI-powered search overviews. Free download.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="NOVA Browser — A quieter way to explore">
+  <meta property="og:description" content="A beautifully considered browser for Mac. Meet NOVA Frost.">
+  <title>NOVA Browser — A quieter way to explore</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="site-shell">
+    <header class="site-header" id="top">
+      <nav class="nav wrap" aria-label="Main navigation">
+        <a class="brand" href="#top" aria-label="NOVA Browser home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 3 18.7 13.3 29 16l-10.3 2.7L16 29l-2.7-10.3L3 16l10.3-2.7L16 3Z" fill="currentColor"/></svg></span><span>NOVA<span class="brand-soft"> Browser</span></span></a>
+        <div class="nav-links" id="nav-links">
+          <a href="#experience">Experience</a>
+          <a href="#features">Features</a>
+          <a href="#story">Philosophy</a>
+          <a href="#download">Download</a>
+        </div>
+        <div class="nav-actions">
+          <button class="theme-button" id="theme-switch" type="button" aria-label="Theme: automatic. Change theme" title="Change appearance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2m10-10h-2M4 12H2m17.1-7.1-1.5 1.5M6.4 17.6l-1.5 1.5m14.2 0-1.5-1.5M6.4 6.4 4.9 4.9"/></svg><span class="theme-text">Auto</span></button>
+          <a class="nav-download" href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.1.7/Nova-OS-Installer.pkg" target="_blank" rel="noopener">Get NOVA <span aria-hidden="true">↗</span></a>
+          <button class="menu-button" type="button" id="menu-button" aria-controls="nav-links" aria-expanded="false" aria-label="Open menu"><span></span><span></span></button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero wrap" aria-labelledby="hero-heading">
+        <div class="ambient ambient-one" aria-hidden="true"></div>
+        <div class="ambient ambient-two" aria-hidden="true"></div>
+        <div class="hero-content">
+          <a href="#download" class="announcement entrance"><span class="announcement-dot"></span><span>NOVA Frost <span class="announcement-version">1.1.7</span> is here</span><span class="announcement-arrow" aria-hidden="true">↗</span></a>
+          <p class="eyebrow entrance delay-1">A NEW PERSPECTIVE ON BROWSING</p>
+          <h1 id="hero-heading" class="entrance delay-2">The web, with<br><em>a little more wonder.</em></h1>
+          <p class="hero-description entrance delay-3">Less noise. More room to think. Meet a beautifully simple Mac browser made for the curious.</p>
+          <div class="hero-actions entrance delay-4">
+            <a class="button button-primary" href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.1.7/Nova-OS-Installer.pkg" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg> Download for Mac</a>
+            <a class="button button-quiet" href="#experience">Explore NOVA <span aria-hidden="true">↘</span></a>
+          </div>
+          <p class="hero-footnote entrance delay-4"><span class="tiny-dot"></span> Free to download <span class="footnote-separator">·</span> macOS 13+ <span class="footnote-separator">·</span> Apple silicon &amp; Intel</p>
+        </div>
+      </section>
+
+      <section id="experience" class="experience-section" aria-labelledby="experience-heading">
+        <div class="wrap">
+          <div class="browser-stage reveal">
+            <div class="stage-light stage-light-one" aria-hidden="true"></div>
+            <div class="stage-light stage-light-two" aria-hidden="true"></div>
+            <div class="browser-preview" id="browser-preview" aria-label="Illustrative NOVA Browser interface preview">
+              <div class="preview-topbar">
+                <div class="traffic-lights" aria-hidden="true"><i></i><i></i><i></i></div>
+                <div class="preview-toolbar">
+                  <span class="preview-icon" aria-hidden="true">‹</span>
+                  <span class="preview-icon" aria-hidden="true">›</span>
+                  <div class="preview-address"><span class="address-lock" aria-hidden="true">⌕</span><span id="preview-address-text">Search or enter a website</span></div>
+                  <span class="preview-icon preview-add" aria-hidden="true">＋</span>
+                </div>
+              </div>
+              <div class="preview-tabs" aria-hidden="true"><div class="preview-tab selected"><span class="tab-favicon">✦</span> New Tab <span class="tab-x">×</span></div><div class="preview-tab"><span class="tab-favicon alt">◈</span> Explore <span class="tab-x">×</span></div><span class="tabs-plus">＋</span></div>
+              <div class="preview-content">
+                <div class="preview-stars" aria-hidden="true">✦</div>
+                <span class="preview-kicker">WELCOME TO NOVA</span>
+                <h2 id="experience-heading">A calmer corner<br>of the internet.</h2>
+                <p>Where would you like to go?</p>
+                <form class="demo-search" id="demo-search" role="search">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.9" cy="10.9" r="6.8"/><path d="m16 16 5 5"/></svg>
+                  <input id="demo-query" name="q" placeholder="Search the web, or ask a question..." aria-label="Try a NOVA search" autocomplete="off" maxlength="180">
+                  <button class="demo-search-go" type="submit" aria-label="Search in NOVA web search">↗</button>
+                </form>
+                <div class="preview-favorites" aria-label="Example favorites">
+                  <a href="https://nova-os-browser.vercel.app/" target="_blank" rel="noopener"><span class="favorite-icon fav-nova">✦</span><span>NOVA OS</span></a>
+                  <a href="https://github.com/" target="_blank" rel="noopener"><span class="favorite-icon fav-git">⌘</span><span>GitHub</span></a>
+                  <a href="https://www.youtube.com/" target="_blank" rel="noopener"><span class="favorite-icon fav-video">▶</span><span>YouTube</span></a>
+                  <a href="https://en.wikipedia.org/" target="_blank" rel="noopener"><span class="favorite-icon fav-wiki">W</span><span>Wikipedia</span></a>
+                </div>
+              </div>
+              <div class="preview-status"><span>✦ NOVA Browser</span><span>Designed for macOS</span></div>
+            </div>
+            <p class="preview-caption">A small preview of a more thoughtful browsing experience <span>·</span> Concept visualization</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="features-section wrap" aria-labelledby="features-heading">
+        <div class="section-intro reveal">
+          <p class="eyebrow">THE DETAILS MATTER</p>
+          <h2 id="features-heading">Everything you need.<br><em>Nothing in your way.</em></h2>
+          <p>Comfortable to use, easy to explore, and thoughtfully built around your flow.</p>
+        </div>
+        <div class="features-grid">
+          <article class="feature-card feature-card-large reveal">
+            <div class="feature-meta"><span class="feature-index">01 / A familiar feeling</span><span class="feature-symbol" aria-hidden="true">◉</span></div>
+            <div class="feature-visual feature-visual-appearance" aria-hidden="true">
+              <div class="appearance-left"><div class="appearance-head"><i></i><i></i><i></i></div><div class="appearance-bar"></div><div class="appearance-line"></div><div class="appearance-line short"></div><div class="appearance-card"></div></div>
+              <div class="appearance-right"><div class="appearance-head"><i></i><i></i><i></i></div><div class="appearance-bar"></div><div class="appearance-line"></div><div class="appearance-line short"></div><div class="appearance-card"></div></div>
+              <div class="appearance-switch">☼ <span>↔</span> ◐</div>
+            </div>
+            <div class="feature-copy"><h3>At home on your Mac.</h3><p>Native macOS design with soft, translucent controls and an interface that follows your system appearance.</p></div>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-meta"><span class="feature-index">02 / Clear perspective</span><span class="feature-symbol" aria-hidden="true">✦</span></div>
+            <div class="feature-visual feature-visual-search" aria-hidden="true"><div class="search-glow"></div><div class="search-mini"><span class="mini-badge">✦ NOVA SEARCH</span><div class="mini-line big"></div><div class="mini-line"></div><div class="mini-line short"></div><div class="mini-source">↗ Sources alongside insights</div></div></div>
+            <div class="feature-copy"><h3>Find a little more.</h3><p>Explore results from the web, with AI-generated search overviews designed to help you get oriented.</p></div>
+          </article>
+          <article class="feature-card reveal">
+            <div class="feature-meta"><span class="feature-index">03 / Your own rhythm</span><span class="feature-symbol" aria-hidden="true">▤</span></div>
+            <div class="feature-visual feature-visual-tabs" aria-hidden="true"><div class="mini-tab active">✦ &nbsp; NOVA <span>×</span></div><div class="mini-tab">◈ &nbsp; Research <span>×</span></div><div class="mini-tab">⌘ &nbsp; GitHub <span>×</span></div></div>
+            <div class="feature-copy"><h3>Stay in your flow.</h3><p>Keep your tabs, bookmarks, and browsing history close, with sessions that remember where you left off.</p></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="quote-section" id="story" aria-labelledby="story-heading">
+        <div class="wrap quote-layout reveal">
+          <div class="quote-symbol" aria-hidden="true">✳</div>
+          <p class="eyebrow">A DIFFERENT KIND OF BROWSER</p>
+          <h2 id="story-heading">Technology should feel<br><em>like more space to think.</em></h2>
+          <p>We believe great software should fade into the background. What matters is what you discover, create, and imagine along the way.</p>
+          <a href="https://github.com/Ethan-cat-a/Nova-OS" target="_blank" rel="noopener" class="text-link">Explore the project on GitHub <span aria-hidden="true">↗</span></a>
+        </div>
+      </section>
+
+      <section id="download" class="download-section wrap" aria-labelledby="download-heading">
+        <div class="download-card reveal">
+          <div class="download-orb orb-a" aria-hidden="true"></div><div class="download-orb orb-b" aria-hidden="true"></div>
+          <div class="download-text">
+            <span class="download-overline"><span class="status-dot"></span> AVAILABLE NOW · VERSION 1.1.7</span>
+            <h2 id="download-heading">Your next tab<br><em>starts here.</em></h2>
+            <p>Make a little more room for curiosity. NOVA Frost is free for Mac.</p>
+            <div class="download-actions"><a class="button button-white" href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.1.7/Nova-OS-Installer.pkg" target="_blank" rel="noopener">Download for macOS <span aria-hidden="true">↗</span></a><a class="button button-outline" href="https://github.com/Ethan-cat-a/Nova-OS/releases/tag/v1.1.7" target="_blank" rel="noopener">Release notes</a></div>
+            <p class="download-footnote">macOS 13 or later · Apple silicon and Intel · Manual installation required for Frost</p>
+          </div>
+          <div class="download-icon-wrap" aria-hidden="true"><div class="download-icon">✦</div><div class="icon-shadow"></div></div>
+        </div>
+      </section>
+
+      <section class="faq wrap" aria-labelledby="faq-heading">
+        <div class="faq-head reveal"><p class="eyebrow">GOOD TO KNOW</p><h2 id="faq-heading">A few small details.</h2></div>
+        <div class="faq-list reveal">
+          <details><summary>Is NOVA Browser free? <span aria-hidden="true">＋</span></summary><p>Yes, NOVA Browser is currently free to download and use.</p></details>
+          <details><summary>Which Macs does it support? <span aria-hidden="true">＋</span></summary><p>NOVA Browser supports macOS 13 and later, including Apple silicon and Intel Macs.</p></details>
+          <details><summary>How do updates work? <span aria-hidden="true">＋</span></summary><p>Version 1.1.7 Frost needs to be installed manually using the installer above. The existing Sparkle automatic-update feed has not yet been updated for this release.</p></details>
+          <details><summary>What powers NOVA Browser? <span aria-hidden="true">＋</span></summary><p>It's a native macOS app built with Apple's WebKit, with NOVA Search and optional AI-generated overviews of search results.</p></details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer-top">
+        <a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true">✦</span><span>NOVA<span class="brand-soft"> Browser</span></span></a>
+        <p>A little more wonder, one tab at a time.</p>
+        <div class="footer-links"><a href="#experience">Experience</a><a href="#features">Features</a><a href="https://github.com/Ethan-cat-a/Nova-OS" target="_blank" rel="noopener">GitHub ↗</a><a href="https://nova-os-browser.vercel.app/" target="_blank" rel="noopener">NOVA OS ↗</a></div>
+      </div>
+      <div class="wrap footer-bottom"><span>© <span id="year">2026</span> NOVA Browser. Made for curious minds.</span><a href="#top">Back to top ↑</a></div>
+    </footer>
+  </div>
+</body>
+</html>
