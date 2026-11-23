@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/search",
+      "destination": "https://nova-os-legacy.vercel.app/api/search"
+    },
+    {
+      "source": "/api/research",
+      "destination": "https://nova-os-legacy.vercel.app/api/research"
+    }
+  ]
+}
