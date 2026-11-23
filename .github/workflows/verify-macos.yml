@@ -1,0 +1,43 @@
+name: Verify NOVA Orbit macOS
+
+on:
+  push:
+    branches:
+      - feature/orbit-1.2
+    paths:
+      - "Sources/**"
+      - "Tests/**"
+      - "Package.swift"
+      - "Info.plist"
+      - "build.sh"
+      - ".github/workflows/verify-macos.yml"
+  pull_request:
+    paths:
+      - "Sources/**"
+      - "Tests/**"
+      - "Package.swift"
+      - "Info.plist"
+      - "build.sh"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Swift navigation tests
+        run: swift test --disable-sandbox
+      - name: Build universal macOS installer
+        run: NOVA_INSTALLER_ONLY=1 ./build.sh
+      - name: Verify signed bundle and version
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "dist/Nova-OS-Installer.pkg"
+          test -d "dist/Nova OS.app"
+          /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "dist/Nova OS.app/Contents/Info.plist" | grep -x '1.2.0'
+          codesign --verify --deep --strict "dist/Nova OS.app"

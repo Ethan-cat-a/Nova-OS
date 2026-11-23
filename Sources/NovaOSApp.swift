@@ -86,7 +86,7 @@ private enum NovaOS {
     </head>
     <body>
       <main>
-        <div class="mark" aria-hidden="true">✦</div>
+        <div class="mark" aria-hidden="true"><svg viewBox="0 0 64 64" width="40" height="40" fill="none"><ellipse cx="32" cy="32" rx="27" ry="12" transform="rotate(-28 32 32)" stroke="#e2d5ff" stroke-width="3"/><path d="M32 7c3.5 17 7.5 21.5 25 25-17.5 3.5-21.5 8-25 25-3.5-17-7.5-21.5-25-25C24.5 28.5 28.5 24 32 7Z" fill="white"/><path d="M8 42c12 12 38 2 48-16" stroke="#fff" stroke-opacity=".9" stroke-width="3" stroke-linecap="round"/></svg></div>
         <p class="eyebrow">NOVA BROWSER</p>
         <h1 id="greeting">A better place to explore.</h1>
         <p class="subtitle">Your web, thoughtfully organized.</p>
@@ -382,6 +382,16 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     private var downloads: [BrowserDownload] = []
     private var overviewCache: [String: (summary: String, generatedAt: Date)] = [:]
     private var pendingSessionSave: DispatchWorkItem?
+    private var orbitPalette: OrbitCommandPaletteController?
+    private var orbitFinder: OrbitFindController?
+    private var recentlyClosedTabs: [SessionEntry] = []
+    private static let overviewPreferenceKey = "NovaOS.AIOverviewsEnabled"
+    private var overviewMenuItem: NSMenuItem?
+    private var isOverviewEnabled: Bool {
+        let prefs = UserDefaults.standard
+        return prefs.object(forKey: Self.overviewPreferenceKey) == nil
+            || prefs.bool(forKey: Self.overviewPreferenceKey)
+    }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         updaterController = SPUStandardUpdaterController(
@@ -685,6 +695,89 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         openSessionEntry(entry, in: tab)
     }
 
+
+    // MARK: - Orbit: keyboard-first commands, tab recovery, and page search
+
+    @objc private func showOrbitPalette() {
+        if addressPopover?.isShown == true { addressPopover.performClose(nil) }
+        if orbitPalette == nil {
+            orbitPalette = OrbitCommandPaletteController(
+                window: window, anchor: addressField,
+                items: { [weak self] input in self?.orbitItems(matching: input) ?? [] }
+            )
+        }
+        orbitPalette?.show()
+    }
+
+    private func orbitItems(matching input: String) -> [OrbitCommandPaletteController.Item] {
+        var items: [OrbitCommandPaletteController.Item] = []
+        let query = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        func offer(_ title: String, _ detail: String, _ symbol: String, _ action: @escaping () -> Void) {
+            guard query.isEmpty || (title + " " + detail).localizedCaseInsensitiveContains(query) else { return }
+            items.append(.init(title: title, detail: detail, symbol: symbol, perform: action))
+        }
+        offer("New Tab", "Open a fresh tab", "plus") { [weak self] in self?.newTab() }
+        offer("Find in Page", "Search text on the current page", "text.magnifyingglass") { [weak self] in self?.showFindOnPage() }
+        offer("Downloads", "Show recent downloads", "arrow.down.circle") { [weak self] in
+            guard let self else { return }
+            self.showDownloadsMenu(self.downloadsButton)
+        }
+        offer("Address Bar", "Enter a URL or search", "globe") { [weak self] in self?.focusAddress() }
+        if !recentlyClosedTabs.isEmpty {
+            offer("Reopen Closed Tab", "Restore your last closed page", "arrow.uturn.backward") { [weak self] in
+                self?.reopenClosedTab()
+            }
+        }
+        for tab in tabs {
+            let tabID = tab.id
+            let title = tab.webView.title?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let displayTitle = title.flatMap { $0.isEmpty ? nil : $0 } ?? "New Tab"
+            offer(displayTitle, tab.sessionEntry.value ?? "Open tab", "square.on.square") { [weak self] in
+                guard let self, let target = self.tabs.first(where: { $0.id == tabID }) else { return }
+                self.selectTab(target)
+            }
+        }
+        for bookmark in bookmarks.reversed() {
+            let entry = SessionEntry(kind: .website, value: bookmark.url)
+            offer(bookmark.title, bookmark.url, "star") { [weak self] in
+                guard let self, let current = self.selectedTab else { return }
+                self.openSessionEntry(entry, in: current)
+            }
+        }
+        for item in history.prefix(15) {
+            let entry = item.sessionEntry
+            offer(item.title, entry.value ?? "Recent page", "clock") { [weak self] in
+                guard let self, let current = self.selectedTab else { return }
+                self.openSessionEntry(entry, in: current)
+            }
+        }
+        return items
+    }
+
+    @objc private func showFindOnPage() {
+        guard let page = selectedTab?.webView else { return }
+        if orbitFinder == nil { orbitFinder = OrbitFindController(window: window, anchor: addressField) }
+        orbitFinder?.show(for: page)
+    }
+
+    @objc private func reopenClosedTab() {
+        guard !recentlyClosedTabs.isEmpty else { return }
+        let entry = recentlyClosedTabs.removeFirst()
+        _ = createTab(entry: entry, select: true)
+    }
+
+    @objc private func selectTabByNumber(_ item: NSMenuItem) {
+        guard tabs.indices.contains(item.tag) else { return }
+        selectTab(tabs[item.tag])
+    }
+
+    @objc private func toggleAIOverviews() {
+        let nowEnabled = !isOverviewEnabled
+        UserDefaults.standard.set(nowEnabled, forKey: Self.overviewPreferenceKey)
+        overviewMenuItem?.state = nowEnabled ? .on : .off
+        if !nowEnabled { overviewCache.removeAll() }
+    }
+
     private func makeSymbolButton(_ symbol: String, tooltip: String, action: Selector) -> NSButton {
         let image = NSImage(systemSymbolName: symbol, accessibilityDescription: tooltip)
         let button = NSButton(image: image ?? NSImage(), target: self, action: action)
@@ -708,6 +801,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         configuration.websiteDataStore = .default()
         configuration.userContentController.add(self, name: "novaNavigate")
         configuration.userContentController.add(self, name: "novaCache")
+        configuration.userContentController.add(self, name: "novaResearch")
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.navigationDelegate = self
         webView.uiDelegate = self
@@ -925,7 +1019,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
 
     private func requestOverview(query rawQuery: String, sourcePayloads: [[String: Any]], for tab: BrowserTab) {
         let query = rawQuery.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty, query.utf8.count <= 800 else { return }
+        guard isOverviewEnabled, !query.isEmpty, query.utf8.count <= 800 else { return }
         let sources: [[String: String]] = sourcePayloads.prefix(5).compactMap { source in
             guard let urlString = source["url"] as? String,
                   let url = URL(string: urlString),
@@ -1005,7 +1099,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     private func renderOverview(_ summary: String, sources: [[String: String]], query: String, in tab: BrowserTab, requestID: UUID) {
-        guard tab.overviewRequestID == requestID,
+        guard isOverviewEnabled, tab.overviewRequestID == requestID,
               tab.sessionEntry.kind == .search,
               tab.sessionEntry.value == query else { return }
         let summaryLiteral = NovaOS.javascriptLiteral(summary, fallback: "\"\"")
@@ -1151,6 +1245,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         let appNewTabItem = NSMenuItem(title: "New Tab", action: #selector(newTab), keyEquivalent: "t")
         appNewTabItem.target = self
         appMenu.addItem(appNewTabItem)
+        let overviewItem = NSMenuItem(title: "AI Search Overviews", action: #selector(toggleAIOverviews), keyEquivalent: "")
+        overviewItem.target = self
+        overviewItem.state = isOverviewEnabled ? .on : .off
+        overviewMenuItem = overviewItem
+        appMenu.addItem(overviewItem)
         let homeItem = NSMenuItem(title: "Open Nova OS Home", action: #selector(openHome), keyEquivalent: "")
         homeItem.target = self
         appMenu.addItem(homeItem)
@@ -1163,10 +1262,27 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
 
         let fileMenuItem = NSMenuItem(title: "File", action: nil, keyEquivalent: "")
         let fileMenu = NSMenu(title: "File")
+        let commandsItem = NSMenuItem(title: "NOVA Command Palette", action: #selector(showOrbitPalette), keyEquivalent: "k")
+        commandsItem.target = self
+        fileMenu.addItem(commandsItem)
+        let findItem = NSMenuItem(title: "Find in Page", action: #selector(showFindOnPage), keyEquivalent: "f")
+        findItem.target = self
+        fileMenu.addItem(findItem)
+        fileMenu.addItem(.separator())
         let newTabItem = NSMenuItem(title: "New Tab", action: #selector(newTab), keyEquivalent: "t")
         newTabItem.target = self
         fileMenu.addItem(newTabItem)
         fileMenu.addItem(NSMenuItem(title: "Close Tab", action: #selector(closeSelectedTab), keyEquivalent: "w"))
+        let reopenItem = NSMenuItem(title: "Reopen Closed Tab", action: #selector(reopenClosedTab), keyEquivalent: "t")
+        reopenItem.keyEquivalentModifierMask = [.command, .shift]
+        reopenItem.target = self
+        fileMenu.addItem(reopenItem)
+        for index in 1...9 {
+            let item = NSMenuItem(title: "Switch to Tab \(index)", action: #selector(selectTabByNumber(_:)), keyEquivalent: String(index))
+            item.tag = index - 1
+            item.target = self
+            fileMenu.addItem(item)
+        }
         let reloadItem = NSMenuItem(title: "Reload", action: #selector(reloadPage), keyEquivalent: "r")
         reloadItem.target = self
         fileMenu.addItem(reloadItem)
@@ -1507,6 +1623,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     private func closeTab(id: String?) {
         guard let tab = tab(id: id), let index = tabs.firstIndex(where: { $0.id == tab.id }) else { return }
         guard tabs.count > 1 else {
+            if tab.sessionEntry.kind != .home {
+                recentlyClosedTabs.insert(tab.sessionEntry, at: 0)
+                recentlyClosedTabs = Array(recentlyClosedTabs.prefix(12))
+            }
             tab.sessionEntry = SessionEntry(kind: .home, value: nil)
             tab.isInternalPage = true
             tab.hasLoaded = true
@@ -1516,6 +1636,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
 
         let wasSelected = tab.id == selectedTabID
+        if tab.sessionEntry.kind != .home {
+            recentlyClosedTabs.insert(tab.sessionEntry, at: 0)
+            recentlyClosedTabs = Array(recentlyClosedTabs.prefix(12))
+        }
         tab.itemView.removeFromSuperview()
         tab.webView.stopLoading()
         tabs.remove(at: index)

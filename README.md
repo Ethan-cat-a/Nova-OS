@@ -5,10 +5,10 @@
   <p>
     <img src="https://img.shields.io/badge/macOS-13%2B-5967e8?style=for-the-badge&logo=apple&logoColor=white" alt="macOS 13 or later" />
     <img src="https://img.shields.io/badge/Apple_Silicon-Intel-7654df?style=for-the-badge" alt="Apple Silicon and Intel" />
-    <img src="https://img.shields.io/badge/version-1.1.7-172146?style=for-the-badge" alt="Version 1.1.7" />
+    <img src="https://img.shields.io/badge/version-1.2.0-172146?style=for-the-badge" alt="Version 1.1.7" />
   </p>
   <p>
-    <a href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.1.7/Nova-OS-Installer.pkg"><strong>↓ Download Nova OS 1.1.7 Frost for Mac</strong></a>
+    <a href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.2.0/Nova-OS-Installer.pkg"><strong>↓ Download Nova OS 1.2.0 Orbit for Mac</strong></a>
     &nbsp; · &nbsp;
     <a href="https://nova-os-browser.vercel.app/">Open the web version</a>
     &nbsp; · &nbsp;
@@ -19,6 +19,18 @@
 ---
 
 Nova OS for Mac brings the live Nova OS site into a native macOS window and includes a built-in browser for everyday websites.
+
+## NOVA Orbit — new in 1.2.0
+
+Orbit adds the Command-K palette for tabs, bookmarks, history and actions; WebKit Find in Page
+(Command-F); Command-Shift-T tab recovery; and Command-1 through Command-9 tab switching.
+AI Overviews can be disabled from the app menu, and the Nova Research message handler
+is now correctly registered for search results. The new-tab dashboard uses the orbital-star
+brand.
+
+Orbit was compiled for Apple silicon and Intel and its navigation tests pass.
+Sparkle requires the original Ed25519 signing key; without it, installation is manual.
+Private windows and pinned/drag-reordered tabs remain future improvements.
 
 ## Nova Frost — new in 1.1.7
 
@@ -50,11 +62,11 @@ The **Nova OS** app menu includes the start page, new tab, and update controls. 
 
 ## Automatic updates
 
-**Nova OS 1.1.7 requires manual installation.** The CI build did not have the original Sparkle signing key, so the automatic-update feed still offers version 1.1.6. Download and run the new 1.1.7 installer above instead. Once the original signing key is securely configured for future builds, signed Sparkle automatic updates can resume.
+**Nova OS 1.2.0 requires manual installation unless the existing Sparkle signing key is configured for the release build.** The last signed automatic-update feed advertises 1.1.6. If the private key remains unavailable in CI, install Orbit using the 1.2.0 package above instead; do not reuse or replace the public key to sign an incompatible feed.
 
 ## Install
 
-1. Download **Nova OS 1.1.7 Frost for Mac** above.
+1. Download **Nova OS 1.2.0 Orbit for Mac** above.
 2. Open `Nova-OS-Installer.pkg` and follow the macOS Installer steps.
 3. Find **Nova OS** in `/Applications`.
 
