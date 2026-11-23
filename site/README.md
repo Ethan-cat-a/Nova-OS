@@ -1,9 +1,9 @@
-# NOVA Browser — Frost landing page
+# NOVA OS — official Mac browser website
 
-The standalone, dependency-free marketing/download website for **NOVA Browser for macOS**.
+The official, standalone marketing/download website for **NOVA OS for macOS**.
 
-- **Host:** Vercel (`nova-browser-frost` project)
-- **Domain:** `nova-os-frost.vercel.app` (live, no external DNS required)
+- **Host:** Vercel (`nova-os` project)
+- **Domain:** `nova-os-browser.vercel.app` (live, no external DNS required)
 - **GitHub:** `Ethan-cat-a/Nova-OS/site`
 - **Release download:** [NOVA OS 1.2.0 installer](https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.2.0/Nova-OS-Installer.pkg)
 

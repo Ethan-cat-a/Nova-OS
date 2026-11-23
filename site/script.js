@@ -96,7 +96,7 @@
       demoNote.style.cssText = "font-size:11px;max-width:460px;margin:12px 0 0;text-align:center;color:#9298c7;line-height:1.5";
       demoForm.insertAdjacentElement("afterend", demoNote);
     }
-    demoNote.textContent = "Preview only — download NOVA Browser to explore the web with NOVA Search.";
+    demoNote.textContent = "Preview only — download NOVA OS to explore the web with NOVA Search.";
   });
 
   const year = document.getElementById("year");

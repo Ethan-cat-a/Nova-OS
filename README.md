@@ -5,14 +5,14 @@
   <p>
     <img src="https://img.shields.io/badge/macOS-13%2B-5967e8?style=for-the-badge&logo=apple&logoColor=white" alt="macOS 13 or later" />
     <img src="https://img.shields.io/badge/Apple_Silicon-Intel-7654df?style=for-the-badge" alt="Apple Silicon and Intel" />
-    <img src="https://img.shields.io/badge/version-1.2.0-172146?style=for-the-badge" alt="Version 1.1.7" />
+    <img src="https://img.shields.io/badge/version-1.2.0-172146?style=for-the-badge" alt="Version 1.2.0" />
   </p>
   <p>
     <a href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.2.0/Nova-OS-Installer.pkg"><strong>↓ Download Nova OS 1.2.0 Orbit for Mac</strong></a>
     &nbsp; · &nbsp;
-    <a href="https://nova-os-browser.vercel.app/">Open the web version</a>
+    <a href="https://nova-os-browser.vercel.app/">Official NOVA OS website</a>
     &nbsp; · &nbsp;
-    <a href="https://nova-browser-frost.vercel.app/">NOVA Frost website</a>
+    <a href="https://nova-technologies-ai.vercel.app/#products">NOVA Technologies products</a>
   </p>
 </div>
 
