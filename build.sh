@@ -50,7 +50,13 @@ swift build --disable-sandbox \
   --security-path "$BUILD_DIR/SwiftPMSecurity" \
   --scratch-path "$SPM_DIR" \
   --manifest-cache local -c release -debug-info-format none --triple arm64-apple-macosx13.0
-cp "$SPM_DIR/out/Products/Release/NovaOS" "$BUILD_DIR/NovaOS-arm64"
+ARM_BIN_DIR="$(swift build --disable-sandbox \
+  --cache-path "$BUILD_DIR/SwiftPMCache" \
+  --config-path "$BUILD_DIR/SwiftPMConfig" \
+  --security-path "$BUILD_DIR/SwiftPMSecurity" \
+  --scratch-path "$SPM_DIR" \
+  --manifest-cache local -c release --triple arm64-apple-macosx13.0 --show-bin-path)"
+cp "$ARM_BIN_DIR/NovaOS" "$BUILD_DIR/NovaOS-arm64"
 
 swift build --disable-sandbox \
   --cache-path "$BUILD_DIR/SwiftPMCache" \
@@ -58,7 +64,13 @@ swift build --disable-sandbox \
   --security-path "$BUILD_DIR/SwiftPMSecurity" \
   --scratch-path "$SPM_DIR" \
   --manifest-cache local -c release -debug-info-format none --triple x86_64-apple-macosx13.0
-cp "$SPM_DIR/out/Products/Release/NovaOS" "$BUILD_DIR/NovaOS-x86_64"
+INTEL_BIN_DIR="$(swift build --disable-sandbox \
+  --cache-path "$BUILD_DIR/SwiftPMCache" \
+  --config-path "$BUILD_DIR/SwiftPMConfig" \
+  --security-path "$BUILD_DIR/SwiftPMSecurity" \
+  --scratch-path "$SPM_DIR" \
+  --manifest-cache local -c release --triple x86_64-apple-macosx13.0 --show-bin-path)"
+cp "$INTEL_BIN_DIR/NovaOS" "$BUILD_DIR/NovaOS-x86_64"
 
 ARM_BINARY="$BUILD_DIR/NovaOS-arm64"
 INTEL_BINARY="$BUILD_DIR/NovaOS-x86_64"
