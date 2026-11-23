@@ -1,0 +1,92 @@
+name: Publish NOVA OS for macOS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - Info.plist
+      - .github/workflows/publish-macos.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nova-os-macos-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build and publish the macOS installer
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Restore existing Sparkle signing key (if configured)
+        shell: bash
+        env:
+          SPARKLE_KEY: ${{ secrets.NOVA_SPARKLE_ED25519_PRIVATE }}
+        run: |
+          if [[ -n "$SPARKLE_KEY" ]]; then
+            mkdir -p .secrets
+            printf '%s' "$SPARKLE_KEY" > .secrets/sparkle-ed25519.private
+            chmod 600 .secrets/sparkle-ed25519.private
+            echo "Existing Sparkle signing key available."
+          else
+            echo "::warning::No NOVA_SPARKLE_ED25519_PRIVATE secret: standalone installer only. This release will not be available through Sparkle automatic updates."
+          fi
+
+      - name: Build universal app and verify signature
+        shell: bash
+        run: NOVA_INSTALLER_ONLY=1 ./build.sh
+
+      - name: Publish release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Info.plist)"
+          BUILD_NUMBER="$(/usr/libexec/PlistBuddy -c 'Print CFBundleVersion' Info.plist)"
+          TAG="v$VERSION"
+          PKG="dist/Nova-OS-Installer.pkg"
+          ZIP="updates/Nova-OS-$VERSION-build$BUILD_NUMBER.zip"
+          test -f "$PKG"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::error::Release $TAG already exists."
+            exit 1
+          fi
+          {
+            echo "NOVA Frost gives Nova OS a quieter, more native macOS look."
+            echo ""
+            echo "- Adaptive macOS Light and Dark Mode."
+            echo "- Translucent native toolbar, tab strip and address bar."
+            echo "- Refined tab selection and toolbar icons."
+            echo "- Redesigned new-tab page, greeting, and favorites."
+            echo "- Softer light and dark Nova Search appearance."
+            echo ""
+            echo "**Note:** This build is ad-hoc signed rather than Apple Developer ID notarized."
+          } > release-notes.md
+          ASSETS=("$PKG")
+          if [[ -f "$ZIP" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add updates
+            if ! git diff --cached --quiet; then
+              git commit -m "Publish Sparkle feed for Nova OS $VERSION"
+              git push origin HEAD:main
+            fi
+            ASSETS+=("$ZIP")
+            {
+              echo ""
+              echo "This release includes a signed Sparkle update archive for existing installations."
+            } >> release-notes.md
+          else
+            {
+              echo ""
+              echo "**Manual install required:** The previous Sparkle signing key was not available in CI, so this release does not change the automatic-update feed."
+            } >> release-notes.md
+          fi
+          gh release create "$TAG" "${ASSETS[@]}" --target "$(git rev-parse HEAD)" --title "Nova OS $VERSION — Frost" --notes-file release-notes.md
