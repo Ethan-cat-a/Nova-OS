@@ -22,9 +22,16 @@ UPDATER_ZIP="$UPDATES/Nova-OS-$VERSION-build$BUILD_NUMBER.zip"
 export SWIFT_MODULE_CACHE_PATH="$BUILD_DIR/SwiftModuleCache"
 export CLANG_MODULE_CACHE_PATH="$BUILD_DIR/ClangModuleCache"
 
+SIGN_SPARKLE=true
 if [[ ! -f "$KEY" ]]; then
-  echo "Missing local Sparkle signing key at $KEY" >&2
-  exit 1
+  if [[ "${NOVA_INSTALLER_ONLY:-0}" == "1" ]]; then
+    SIGN_SPARKLE=false
+    echo "No Sparkle key available: building the standalone installer only."
+    echo "Existing installations will require a manual download for this release."
+  else
+    echo "Missing local Sparkle signing key at $KEY" >&2
+    exit 1
+  fi
 fi
 
 rm -rf "$OUTPUT" "$PACKAGE" "$ICONSET" "$ICON_PNG" "$ICON_ICNS" "$UPDATER_ZIP"
@@ -103,25 +110,31 @@ otool -L "$CONTENTS/MacOS/NovaOS" | grep Sparkle
 pkgbuild --component "$OUTPUT" --install-location /Applications \
   --identifier com.novaos.desktop --version "$VERSION" "$PACKAGE"
 
-ditto -c -k --sequesterRsrc --keepParent "$OUTPUT" "$UPDATER_ZIP"
-cat > "$UPDATES/Nova OS $VERSION.html" <<HTML
+if [[ "$SIGN_SPARKLE" == true ]]; then
+  ditto -c -k --sequesterRsrc --keepParent "$OUTPUT" "$UPDATER_ZIP"
+  cat > "$UPDATES/Nova OS $VERSION.html" <<HTML
 <h2>Nova OS $VERSION</h2>
 <ul>
-  <li>Nova AI Overviews summarize search results with source links.</li>
-  <li>The address bar suggests recent pages, searches, and bookmarks.</li>
-  <li>Browsing history and a progress-aware Downloads menu are included.</li>
+  <li>Nova Frost: macOS appearance-aware toolbar and tabs.</li>
+  <li>A calmer start page with favorites and a personalized greeting.</li>
+  <li>Improved light and dark Nova Search themes.</li>
 </ul>
 HTML
 
-SPARKLE_BIN="$SPM_DIR/artifacts/sparkle/Sparkle/bin"
-SIGNATURE="$("$SPARKLE_BIN/sign_update" --ed-key-file "$KEY" -p "$UPDATER_ZIP")"
-"$SPARKLE_BIN/sign_update" --ed-key-file "$KEY" --verify "$UPDATER_ZIP" "$SIGNATURE"
-python3 "$ROOT/scripts/create-appcast.py" \
-  "$UPDATER_ZIP" "$UPDATES/appcast.xml" "$VERSION" "$BUILD_NUMBER" \
-  "$SIGNATURE" "$APPCAST_URL_PREFIX" "https://github.com/Ethan-cat-a/Nova-OS"
+  SPARKLE_BIN="$SPM_DIR/artifacts/sparkle/Sparkle/bin"
+  SIGNATURE="$("$SPARKLE_BIN/sign_update" --ed-key-file "$KEY" -p "$UPDATER_ZIP")"
+  "$SPARKLE_BIN/sign_update" --ed-key-file "$KEY" --verify "$UPDATER_ZIP" "$SIGNATURE"
+  python3 "$ROOT/scripts/create-appcast.py" \
+    "$UPDATER_ZIP" "$UPDATES/appcast.xml" "$VERSION" "$BUILD_NUMBER" \
+    "$SIGNATURE" "$APPCAST_URL_PREFIX" "https://github.com/Ethan-cat-a/Nova-OS"
+fi
 
 echo "Built app: $OUTPUT"
 echo "Installer: $PACKAGE"
-echo "Sparkle update archive: $UPDATER_ZIP"
-echo "Sparkle feed: $UPDATES/appcast.xml"
+if [[ "$SIGN_SPARKLE" == true ]]; then
+  echo "Sparkle update archive: $UPDATER_ZIP"
+  echo "Sparkle feed: $UPDATES/appcast.xml"
+else
+  echo "Sparkle update: not generated (installer-only build)"
+fi
 echo "Build number: $BUILD_NUMBER"
