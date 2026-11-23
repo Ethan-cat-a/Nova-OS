@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - Info.plist
+      - build.sh
       - .github/workflows/publish-macos.yml
   workflow_dispatch:
 
