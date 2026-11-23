@@ -20,6 +20,18 @@
 
 Nova OS for Mac brings the live Nova OS site into a native macOS window and includes a built-in browser for everyday websites.
 
+## NOVA Orbit — 1.2.0 release preparation
+
+Orbit adds the Command-K palette for tabs, bookmarks, history and actions; WebKit Find in Page
+(Command-F); Command-Shift-T tab recovery; and Command-1 through Command-9 tab switching.
+AI Overviews can be disabled from the app menu, and the Nova Research message handler
+is now correctly registered for search results. The new-tab dashboard uses the orbital-star
+brand.
+
+This release is developed and validated on a separate branch before public release.
+Sparkle requires the original Ed25519 signing key; without it, the installer is manual.
+Private windows and pinned/drag-reordered tabs remain future improvements.
+
 ## Nova Frost — new in 1.1.7
 
 The new macOS appearance follows system Light and Dark Mode. Native translucent toolbar surfaces, refined tab selection, an updated search page, and a quieter new-tab dashboard give Nova OS a more Apple-inspired look.
