@@ -78,26 +78,8 @@
     revealItems.forEach(item => observer.observe(item));
   }
 
-  // The site has a working, self-contained product preview; it never pretends
-  // to run the native macOS browser or an AI search service in the webpage.
-  const demoForm = document.getElementById("demo-search");
-  const demoQuery = document.getElementById("demo-query");
-  const addressText = document.getElementById("preview-address-text");
-  let demoNote;
-  demoForm?.addEventListener("submit", event => {
-    event.preventDefault();
-    const query = demoQuery?.value.trim().slice(0, 180);
-    if (!query) { demoQuery?.focus(); return; }
-    if (addressText) addressText.textContent = "Search: " + query;
-    if (!demoNote) {
-      demoNote = document.createElement("p");
-      demoNote.className = "demo-note";
-      demoNote.setAttribute("role", "status");
-      demoNote.style.cssText = "font-size:11px;max-width:460px;margin:12px 0 0;text-align:center;color:#9298c7;line-height:1.5";
-      demoForm.insertAdjacentElement("afterend", demoNote);
-    }
-    demoNote.textContent = "Preview only — download NOVA OS to explore the web with NOVA Search.";
-  });
+  // The preview search form uses standard GET navigation to search.html.
+  // No JavaScript interception: keyboard and assistive-tech form submission works.
 
   const year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());

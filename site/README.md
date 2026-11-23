@@ -18,3 +18,21 @@ The preview is illustrative, not a web implementation of the native WKWebView br
 ## Updating for a new release
 
 Update the installer link, release notes link, displayed version numbers, and README when the next macOS package is verified and published.
+
+## Live search and legacy compatibility
+
+The product preview's search form opens `search.html?q=...`, which renders live
+results from `/api/search` for All, Images, Videos, and News. The page uses
+safe DOM construction and validated HTTP(S) result links, with a Google fallback
+if the provider is temporarily unavailable.
+
+`vercel.json` forwards `/api/search` and `/api/research` to the retained
+`nova-os-legacy.vercel.app` search service. **Do not delete or protect that
+legacy deployment without replacing these routes.** NOVA OS macOS 1.2.0 also
+uses the public `https://nova-os-browser.vercel.app/api/search` endpoint, so
+keeping this route working is required for existing installed Mac clients.
+
+When deploying to Vercel, ensure the public `nova-os-browser.vercel.app` alias
+points to the latest verified release. That alias is not currently managed as
+a project domain under the new `nova-os` project, so it may require an alias
+update after production deployment until the domain is moved in Vercel.

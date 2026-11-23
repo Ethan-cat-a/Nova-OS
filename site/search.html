@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f8f8fa">
+  <meta name="description" content="Search the web with NOVA OS. Discover links, images, videos, and news with a fast, focused interface.">
+  <title>NOVA Search — NOVA OS</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #fafafe; --fg: #24252e; --subtle: #626575; --line: #e5e5ef;
+      --panel: #ffffff; --accent: #5c57c7; --accent-soft: #eeeaff;
+      --shadow: 0 18px 55px rgba(44,42,103,.055);
+    }
+    * { box-sizing: border-box }
+    body { min-height:100vh; margin:0; background:radial-gradient(ellipse at 85% -12%,#e4ddffb3,transparent 42%),var(--bg);
+      color:var(--fg); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif; -webkit-font-smoothing:antialiased }
+    a { color:inherit } button,input { font:inherit }
+    .wrap { max-width:1070px;margin:0 auto;padding:0 28px }
+    .topbar { position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 93%,transparent);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px) }
+    .topinner { min-height:75px;display:flex;align-items:center;justify-content:space-between;gap:22px }
+    .brand { display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:710;letter-spacing:-.045em;font-size:20px }
+    .brand img { width:36px;height:36px }
+    .brand span { font-weight:460;color:var(--subtle) }
+    .toplinks {display:flex;gap:24px;align-items:center}
+    .toplinks a {font-size:13px;text-decoration:none;color:var(--subtle);font-weight:550}
+    .toplinks a:hover {color:var(--accent)}
+    .toplinks .download {border:1px solid var(--line);padding:9px 14px;border-radius:99px;color:var(--fg);background:var(--panel)}
+    main {padding-top:65px;padding-bottom:100px;min-height:calc(100vh - 151px)}
+    .eyebrow {color:var(--accent);font-size:11px;letter-spacing:.19em;font-weight:760;text-transform:uppercase;margin:0 0 15px}
+    h1 {font-size:clamp(34px,5vw,52px);letter-spacing:-.058em;line-height:1.11;margin:0 0 14px;font-weight:720}
+    h1 em {font-style:normal;color:var(--accent)}
+    .lede {color:var(--subtle);font-size:15px;margin:0 0 27px;line-height:1.6}
+    .search-form {max-width:800px;display:flex;align-items:center;gap:10px;background:var(--panel);padding:9px 9px 9px 19px;
+      border-radius:19px;border:1px solid var(--line);box-shadow:var(--shadow)}
+    .search-form:focus-within {border-color:#ada0fa;box-shadow:0 0 0 4px rgba(111,88,213,.12),var(--shadow)}
+    .mag {font-size:24px;color:#9b95ba;line-height:1;flex:none}
+    .search-form input {width:100%;border:0;outline:0;background:transparent;color:var(--fg);padding:10px 3px;font-size:16px;min-width:0}
+    .search-form input::placeholder {color:#9898a6}
+    .search-form button {flex:none;padding:13px 22px;background:#6057ca;border:0;border-radius:12px;color:white;font-weight:660;cursor:pointer}
+    .search-form button:hover {background:#5046b3}
+    .categories {display:flex;gap:6px;max-width:800px;border-bottom:1px solid var(--line);padding-top:26px;overflow-x:auto}
+    .category {flex:none;display:inline-block;padding:10px 15px 14px;color:var(--subtle);font-size:13px;font-weight:550;text-decoration:none;border-bottom:3px solid transparent}
+    .category:hover {color:var(--accent)}
+    .category.active {color:var(--accent);border-color:var(--accent);font-weight:720}
+    .report {max-width:810px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:25px 0;color:var(--subtle);font-size:12px}
+    .report p {margin:0}
+    .backup-link {text-decoration:none;color:var(--accent);font-weight:650}
+    .results {max-width:820px;display:grid;gap:12px}
+    .result {display:block;text-decoration:none;padding:22px 23px;background:var(--panel);border:1px solid var(--line);border-radius:17px;box-shadow:0 4px 18px rgba(44,42,103,.018);transition:transform .14s,border-color .14s}
+    .result:hover,.result:focus-visible {transform:translateY(-2px);border-color:#bdafe8;outline:none}
+    .site {display:flex;align-items:center;gap:9px;color:var(--subtle);font-size:11px;overflow-wrap:anywhere}
+    .site-icon {width:26px;height:26px;flex:none;display:grid;place-items:center;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-weight:700}
+    .result h2 {font-size:17px;letter-spacing:-.017em;line-height:1.4;margin:10px 0 6px;color:var(--accent);font-weight:675}
+    .result p {font-size:13px;line-height:1.55;color:var(--subtle);margin:0;overflow-wrap:anywhere}
+    .results.images {grid-template-columns:repeat(auto-fill,minmax(195px,1fr))}
+    .images .result {padding:9px 9px 15px}
+    .images .result img {width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;background:var(--accent-soft)}
+    .images .result h2 {font-size:13px;margin:10px 6px 4px}
+    .images .result .site {padding:0 6px}
+    .images .result p {display:none}
+    .note {max-width:800px;padding:22px;color:var(--subtle);background:var(--panel);border:1px solid var(--line);border-radius:17px;line-height:1.6}
+    .note strong {color:var(--fg)}
+    .note a {color:var(--accent)}
+    .examples {display:flex;gap:9px;flex-wrap:wrap;margin-top:24px;max-width:800px}
+    .examples a {font-size:12px;text-decoration:none;color:var(--subtle);padding:10px 13px;border-radius:90px;border:1px solid var(--line);background:var(--panel)}
+    .examples a:hover {color:var(--accent);border-color:#a99fef}
+    footer {padding:24px 0;border-top:1px solid var(--line);font-size:12px;color:var(--subtle)}
+    footer .wrap {display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    footer a {text-decoration:none;color:var(--accent)}
+    @media (prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;scroll-behavior:auto!important}}
+    @media (max-width:620px){
+      .wrap {padding:0 17px}
+      .topinner {min-height:66px}
+      .toplinks {gap:10px}
+      .toplinks a:not(.download) {display:none}
+      main {padding-top:44px}
+      .search-form {gap:4px;padding:5px 5px 5px 12px;border-radius:14px}
+      .search-form button {padding:12px 13px}
+      .search-form input {font-size:14px}
+      .result {padding:18px}
+      .report {margin:19px 0}
+    }
+    @media (prefers-color-scheme:dark){
+      :root {color-scheme:dark;--bg:#14151b;--fg:#eeeeff;--subtle:#aaa8be;--line:#30313e;
+        --panel:#20212a;--accent:#b8adff;--accent-soft:#373349;--shadow:0 18px 55px rgba(0,0,0,.14)}
+      body {background:radial-gradient(ellipse at 85% -12%,#34305480,transparent 44%),var(--bg)}
+      .search-form button {background:#7770d8;color:#fff}
+      .search-form button:hover {background:#8e81ed}
+      .toplinks .download {color:var(--fg)}
+      .result:hover,.result:focus-visible {border-color:#665d98}
+      .result h2,.backup-link {color:#b9b0ff}
+      .search-form input::placeholder {color:#848397}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topinner">
+      <a href="/" class="brand" aria-label="NOVA OS home"><img src="logo.svg" width="36" height="36" alt="">NOVA <span>OS</span></a>
+      <nav class="toplinks" aria-label="Site navigation">
+        <a href="/">Home</a>
+        <a href="/#features">Features</a>
+        <a class="download" href="/#download">Get NOVA OS ↗</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <p class="eyebrow">NOVA OS · LIVE WEB SEARCH</p>
+    <h1>Search with <em>clarity.</em></h1>
+    <p class="lede">The web, without the clutter. Explore real results from across the internet.</p>
+    <form class="search-form" action="search.html" method="get" role="search">
+      <span class="mag" aria-hidden="true">⌕</span>
+      <input id="search-input" type="search" name="q" aria-label="Search the web" placeholder="Ask anything or search the web…" maxlength="180" required autocomplete="off" autofocus>
+      <button type="submit">Search ↗</button>
+    </form>
+    <nav class="categories" id="categories" aria-label="Search categories">
+      <a class="category" data-type="all" href="?type=all">All</a>
+      <a class="category" data-type="images" href="?type=images">Images</a>
+      <a class="category" data-type="videos" href="?type=videos">Videos</a>
+      <a class="category" data-type="news" href="?type=news">News</a>
+    </nav>
+    <div class="report">
+      <p id="search-status" role="status" aria-live="polite">Ready when you are.</p>
+      <a id="backup-link" class="backup-link" href="https://www.google.com/" target="_blank" rel="noopener noreferrer">Open Google ↗</a>
+    </div>
+    <section class="results" id="results" aria-label="Search results" aria-busy="false"></section>
+    <div class="examples" id="examples">
+      <a href="?q=macOS+tips">macOS tips</a>
+      <a href="?q=NASA+Artemis">NASA Artemis</a>
+      <a href="?q=learn+Swift">Learn Swift</a>
+    </div>
+  </main>
+  <footer><div class="wrap"><span>NOVA OS Search · Powered by third-party search results</span><a href="/">Back to NOVA OS ↗</a></div></footer>
+  <script>
+    (() => {
+      "use strict";
+      const params = new URLSearchParams(location.search);
+      const query = (params.get("q") || "").trim().slice(0, 180);
+      const allowed = ["all", "images", "videos", "news"];
+      const type = allowed.includes(params.get("type")) ? params.get("type") : "all";
+      const input = document.getElementById("search-input");
+      const status = document.getElementById("search-status");
+      const results = document.getElementById("results");
+      const examples = document.getElementById("examples");
+      const fallback = document.getElementById("backup-link");
+      input.value = query;
+      fallback.href = "https://www.google.com/search?q=" + encodeURIComponent(query);
+      document.querySelectorAll(".category").forEach(link => {
+        link.classList.toggle("active", link.dataset.type === type);
+        if (link.dataset.type === type) link.setAttribute("aria-current", "page");
+        link.href = "search.html?q=" + encodeURIComponent(query) + "&type=" + encodeURIComponent(link.dataset.type);
+      });
+
+      function safeUrl(raw) {
+        try {
+          const url = new URL(String(raw));
+          return url.protocol === "https:" || url.protocol === "http:" ? url : null;
+        } catch { return null; }
+      }
+      function el(tag, className, content) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (content !== undefined) element.textContent = String(content);
+        return element;
+      }
+      function message(heading, detail) {
+        const note = el("div", "note");
+        const title = el("strong", "", heading);
+        const desc = el("p", "", detail);
+        note.append(title, desc);
+        results.replaceChildren(note);
+      }
+      function resultCard(item, category) {
+        if (!item || typeof item !== "object") return null;
+        const url = safeUrl(item.url);
+        if (!url) return null;
+        const link = el("a", "result");
+        link.href = url.href;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        const image = safeUrl(item.imageUrl);
+        if (category === "images" && image) {
+          const img = el("img");
+          img.src = image.href;
+          img.alt = String(item.title || "Image search result").slice(0, 140);
+          img.loading = "lazy";
+          img.referrerPolicy = "no-referrer";
+          link.append(img);
+        }
+        const site = el("div", "site");
+        site.append(el("span", "site-icon", url.hostname.replace(/^www\./, "").charAt(0).toUpperCase()));
+        site.append(el("span", "", url.hostname));
+        const title = el("h2", "", String(item.title || url.hostname).slice(0, 240));
+        const snippet = el("p", "", String(item.snippet || "").slice(0, 700));
+        link.append(site, title, snippet);
+        return link;
+      }
+      async function search() {
+        if (!query) { message("Explore something new.", "Type a topic in the search box above, or choose a suggested search."); return; }
+        examples.hidden = true;
+        document.title = query + " — NOVA Search";
+        status.textContent = "Finding " + type + " results for “" + query + "”…";
+        results.setAttribute("aria-busy", "true");
+        message("Searching the web…", "Looking up current results.");
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 16000);
+        try {
+          const res = await fetch("/api/search?q=" + encodeURIComponent(query) + "&type=" + encodeURIComponent(type), {
+            cache: "no-store", signal: controller.signal, headers: {Accept: "application/json"}
+          });
+          if (!res.ok) throw new Error("Search service returned " + res.status);
+          const data = await res.json();
+          if (!data || !Array.isArray(data.results)) throw new Error("Search response was incomplete");
+          results.replaceChildren();
+          results.classList.toggle("images", type === "images");
+          let count = 0;
+          for (const item of data.results.slice(0, 40)) {
+            const card = resultCard(item, type);
+            if (!card) continue;
+            results.append(card);
+            count += 1;
+          }
+          status.textContent = count + (count === 1 ? " result" : " results") + " · " + (data.provider || "Web Search");
+          if (!count) message("No results found.", "Try different keywords, or use the Google link above.");
+        } catch (error) {
+          status.textContent = "Search is temporarily unavailable";
+          message("Couldn't connect to the search service.", "Try again or use the Google link above. Your query is not lost.");
+        } finally {
+          clearTimeout(timeout);
+          results.setAttribute("aria-busy", "false");
+        }
+      }
+      search();
+    })();
+  </script>
+</body>
+</html>
