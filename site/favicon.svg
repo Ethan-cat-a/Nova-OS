@@ -1,1 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#A6B4FA"/><stop offset="1" stop-color="#6778D6"/></linearGradient></defs><rect width="64" height="64" rx="17" fill="url(#g)"/><path d="m32 8 5.4 18.6L56 32l-18.6 5.4L32 56l-5.4-18.6L8 32l18.6-5.4L32 8Z" fill="#fff"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="novaTitle novaDesc">
+<title id="novaTitle">NOVA Browser orbital star</title><desc id="novaDesc">Luminous four-point nova inside a violet glass app icon, circled by a celestial orbit.</desc>
+<defs>
+<linearGradient id="shell" x1=".12" y1=".03" x2=".88" y2=".97" objectBoundingBox="true"><stop offset="0" stop-color="#A6B7FF"/><stop offset=".19" stop-color="#7778D7"/><stop offset=".55" stop-color="#292D79"/><stop offset=".78" stop-color="#4C3C9F"/><stop offset="1" stop-color="#BF9AFF"/></linearGradient>
+<radialGradient id="aura" cx=".26" cy=".13" r=".88"><stop stop-color="#FFFFFF" stop-opacity=".43"/><stop offset=".38" stop-color="#A1A8FF" stop-opacity=".15"/><stop offset="1" stop-color="#1D1559" stop-opacity="0"/></radialGradient>
+<linearGradient id="orbit" x1=".04" y1=".86" x2=".94" y2=".1"><stop offset="0" stop-color="#ECA4FF"/><stop offset=".19" stop-color="#F3ECFF"/><stop offset=".5" stop-color="#D9E5FF"/><stop offset=".78" stop-color="#C4A5FF"/><stop offset="1" stop-color="#FFFFFF"/></linearGradient>
+<radialGradient id="star" cx=".32" cy=".22" r=".75"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#FCF8FF"/><stop offset=".82" stop-color="#DEDFFF"/><stop offset="1" stop-color="#B6A6FF"/></radialGradient>
+<linearGradient id="gloss" x1="0" y1="0" x2="1" y2=".95"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".58"/><stop offset=".46" stop-color="#D8DEFF" stop-opacity=".14"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+<linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".74"/><stop offset=".45" stop-color="#A2AFFF" stop-opacity=".34"/><stop offset=".75" stop-color="#BD97FF" stop-opacity=".68"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".54"/></linearGradient>
+<filter id="softglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="12"/></filter>
+<filter id="starglow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="11"/></filter>
+<clipPath id="corners"><rect x="19" y="19" width="474" height="474" rx="113"/></clipPath>
+</defs>
+<rect x="13" y="13" width="486" height="486" rx="121" fill="#6D63CA" opacity=".12"/>
+<rect x="19" y="19" width="474" height="474" rx="113" fill="url(#shell)"/>
+<g clip-path="url(#corners)">
+<rect x="19" y="19" width="474" height="474" fill="url(#aura)"/>
+<path d="M-13 348C97 250 136 162 301 100 383 69 464 69 533 44V-15H-13Z" fill="url(#gloss)"/>
+<path d="M-28 449C118 390 193 383 284 403S475 404 541 319V556H-28Z" fill="#C9A0FF" opacity=".23"/>
+<path d="M-26 483C105 452 173 450 265 466s170 9 281-66" fill="none" stroke="#EAD9FF" stroke-opacity=".17" stroke-width="52"/>
+<ellipse cx="256" cy="259" rx="201" ry="82" transform="rotate(-27 256 259)" fill="none" stroke="#BE9CFF" stroke-opacity=".31" stroke-width="25" filter="url(#softglow)"/>
+<ellipse cx="256" cy="259" rx="201" ry="82" transform="rotate(-27 256 259)" fill="none" stroke="url(#orbit)" stroke-opacity=".68" stroke-width="10"/>
+<path d="M256 106C271 206 302 241 404 256 303 272 272 308 256 405 240 307 209 272 108 256 208 240 240 205 256 106Z" fill="#ECE9FF" opacity=".72" filter="url(#starglow)"/>
+<path d="M256 106C271 206 302 241 404 256 303 272 272 308 256 405 240 307 209 272 108 256 208 240 240 205 256 106Z" fill="url(#star)"/>
+<path d="M68 348C112 415 269 394 379 318S465 164 408 134" fill="none" stroke="#D9BBFF" stroke-width="23" opacity=".28" filter="url(#softglow)"/>
+<path d="M68 348C112 415 269 394 379 318S465 164 408 134" fill="none" stroke="url(#orbit)" stroke-width="14" stroke-linecap="round"/>
+<path d="M76 342C128 394 279 378 374 312" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity=".69"/>
+<path d="M82 57C148 25 366 22 426 67" fill="none" stroke="#FFFFFF" stroke-width="13" stroke-linecap="round" opacity=".20" filter="url(#softglow)"/>
+</g>
+<rect x="21" y="21" width="470" height="470" rx="111" fill="none" stroke="url(#edge)" stroke-width="5"/>
+<rect x="28" y="28" width="456" height="456" rx="107" fill="none" stroke="#FFFFFF" stroke-opacity=".24" stroke-width="1.5"/>
+</svg>
