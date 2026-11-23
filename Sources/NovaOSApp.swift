@@ -1038,6 +1038,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
 
     @objc private func reopenClosedTab() {
         guard !recentlyClosedTabs.isEmpty else { return }
+        guard tabs.count < 40 else {
+            showFlowAlert("Space tab limit", detail: "Close a tab before reopening another in this Space.")
+            return
+        }
         let entry = recentlyClosedTabs.removeFirst()
         _ = createTab(entry: entry, select: true)
     }
@@ -1942,6 +1946,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     @objc private func newTab() {
+        guard tabs.count < 40 else {
+            showFlowAlert("Space tab limit", detail: "A Space can contain up to 40 tabs. Close a tab or open another Space.")
+            return
+        }
         _ = createTab()
     }
 
@@ -1961,6 +1969,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     private func closeTab(id: String?) {
         guard let tab = tab(id: id), let index = tabs.firstIndex(where: { $0.id == tab.id }) else { return }
         guard tabs.count > 1 else {
+            // Closing the final pinned tab resets it to a regular New Tab.
+            if tab.isPinned {
+                tab.isPinned = false
+            }
             if tab.sessionEntry.kind != .home {
                 recentlyClosedTabs.insert(tab.sessionEntry, at: 0)
                 recentlyClosedTabs = Array(recentlyClosedTabs.prefix(12))
@@ -1969,6 +1981,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             tab.isInternalPage = true
             tab.hasLoaded = true
             tab.webView.loadHTMLString(NovaOS.newTabHTML, baseURL: nil)
+            refreshTabStripOrder()
             scheduleSessionSave()
             return
         }
@@ -2196,7 +2209,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         for navigationAction: WKNavigationAction,
         windowFeatures: WKWindowFeatures
     ) -> WKWebView? {
-        guard navigationAction.targetFrame == nil else { return nil }
+        guard navigationAction.targetFrame == nil, tabs.count < 40 else { return nil }
         return createTab().webView
     }
 }
