@@ -1,9 +1,9 @@
 # NOVA OS 1.3.0 Flow — implementation, tests and release gates
 
-**Status:** Development / beta. No public version tag or automatic update until manual QA.
+**Status:** Published as a manual-install release on November 24, 2026. Automated Mac tests and universal signing checks passed; full hands-on GUI QA was not performed here.
 **Repo:** `Ethan-cat-a/Nova-OS`, `feature/flow-1.3`.
 **Platform:** Swift 5.9+, AppKit, WebKit, macOS 13+, universal Apple silicon/Intel.
-**Existing stable version:** 1.2.0 Orbit (build 10).
+**Previous stable version:** 1.2.0 Orbit (build 10); preserved for rollback.
 
 ## Feature scope and architecture
 
@@ -113,3 +113,11 @@ and signing evidence.**
 - **Search resilience:** native search first uses the project's stable Vercel domain, and falls back to the public NOVA OS alias if an endpoint is temporarily unavailable.
 - **Save errors:** state-write failures are surfaced instead of discarded.
 - **Tests:** full-quota save, corrupted primary restore, legacy migration.
+
+## Public release verification
+
+- GitHub Release: https://github.com/Ethan-cat-a/Nova-OS/releases/tag/v1.3.0
+- Official installer: https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.3.0/Nova-OS-Installer.pkg
+- macOS CI: all 20 tests passed and the universal x86_64/arm64 installer was built and ad-hoc signature verified.
+- Sparkle auto-update feed remains unchanged because the original private key was absent from CI. Install manually; do not rotate the key.
+- This release has not undergone full in-person graphical testing on physical Macs. Users should verify Spaces, drag/drop and Reader before relying on it for critical work.

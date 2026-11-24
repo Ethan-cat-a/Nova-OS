@@ -5,10 +5,10 @@
   <p>
     <img src="https://img.shields.io/badge/macOS-13%2B-5967e8?style=for-the-badge&logo=apple&logoColor=white" alt="macOS 13 or later" />
     <img src="https://img.shields.io/badge/Apple_Silicon-Intel-7654df?style=for-the-badge" alt="Apple Silicon and Intel" />
-    <img src="https://img.shields.io/badge/version-1.2.0-172146?style=for-the-badge" alt="Version 1.2.0" />
+    <img src="https://img.shields.io/badge/version-1.3.0-172146?style=for-the-badge" alt="Version 1.3.0" />
   </p>
   <p>
-    <a href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.2.0/Nova-OS-Installer.pkg"><strong>↓ Download Nova OS 1.2.0 Orbit for Mac</strong></a>
+    <a href="https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.3.0/Nova-OS-Installer.pkg"><strong>↓ Download Nova OS 1.3.0 Flow for Mac</strong></a>
     &nbsp; · &nbsp;
     <a href="https://nova-os-browser.vercel.app/">Official NOVA OS website</a>
     &nbsp; · &nbsp;
@@ -20,13 +20,16 @@
 
 Nova OS for Mac brings the live Nova OS site into a native macOS window and includes a built-in browser for everyday websites.
 
-## NOVA Flow 1.3.0 (development)
+## NOVA Flow — new in 1.3.0
 
-Flow is being built on a separate feature branch, not yet released. Planned
-features: ranked OmniSearch via Command-K, named local Spaces, visual tab gallery
-(Command-Shift-G), pinned/drag-reorderable tabs, and local Focus Reader (Command-Shift-R).
-The 1.2.0 download below remains the stable installer until Flow passes QA.
-See [Flow implementation and release plan](docs/Flow-1.3.0.md).
+**Released November 24, 2026.** NOVA OmniSearch (Command-K), up to eight named
+Spaces with persistent tabs, Visual Tab Gallery (Command-Shift-G), pinned and
+drag-reorderable tabs, and Focus Reader (Command-Shift-R). The update also
+hardens workspace persistence with atomic writes, backup recovery, and
+a verified fallback for NOVA Search. The universal macOS installer passed
+20 automated tests and signature validation. Full manual GUI testing is
+still recommended. See [Flow release and architecture notes](docs/Flow-1.3.0.md).
+
 
 ## NOVA Orbit — new in 1.2.0
 
@@ -70,11 +73,11 @@ The **Nova OS** app menu includes the start page, new tab, and update controls. 
 
 ## Automatic updates
 
-**Nova OS 1.2.0 requires manual installation unless the existing Sparkle signing key is configured for the release build.** The last signed automatic-update feed advertises 1.1.6. If the private key remains unavailable in CI, install Orbit using the 1.2.0 package above instead; do not reuse or replace the public key to sign an incompatible feed.
+**Nova OS 1.3.0 requires manual installation unless the existing Sparkle signing key is configured for the release build.** The last signed automatic-update feed advertises 1.1.6. If the private key remains unavailable in CI, install Flow using the 1.3.0 package above instead; do not reuse or replace the public key to sign an incompatible feed.
 
 ## Install
 
-1. Download **Nova OS 1.2.0 Orbit for Mac** above.
+1. Download **Nova OS 1.3.0 Flow for Mac** above.
 2. Open `Nova-OS-Installer.pkg` and follow the macOS Installer steps.
 3. Find **Nova OS** in `/Applications`.
 

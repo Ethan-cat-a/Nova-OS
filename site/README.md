@@ -5,7 +5,7 @@ The official, standalone marketing/download website for **NOVA OS for macOS**.
 - **Host:** Vercel (`nova-os` project)
 - **Domain:** `nova-os-browser.vercel.app` (live, no external DNS required)
 - **GitHub:** `Ethan-cat-a/Nova-OS/site`
-- **Release download:** [NOVA OS 1.2.0 installer](https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.2.0/Nova-OS-Installer.pkg)
+- **Release download:** [NOVA OS 1.3.0 installer](https://github.com/Ethan-cat-a/Nova-OS/releases/download/v1.3.0/Nova-OS-Installer.pkg)
 
 This site uses semantic HTML, CSS, and plain JavaScript. It includes accessible mobile navigation, light/dark/automatic appearance preferences, reduced-motion support, scroll reveals, an interactive **concept preview**, and real release/download links.
 
