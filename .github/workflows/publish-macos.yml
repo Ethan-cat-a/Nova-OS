@@ -63,13 +63,14 @@ jobs:
             exit 1
           fi
           {
-            echo "NOVA Orbit makes the native Mac browser faster to navigate."
+            echo "NOVA Flow brings smarter browsing, Spaces, tab organization, and Focus Reader."
             echo ""
-            echo "- Command-K palette: tabs, bookmarks, history and browser actions."
-            echo "- Native Find in Page with Command-F."
-            echo "- Reopen closed tabs with Command-Shift-T; Command-1 to Command-9 tab shortcuts."
-            echo "- AI Overview on/off preference and repaired Nova Research bridge."
-            echo "- Orbital-star new-tab branding."
+            echo "- NOVA OmniSearch: ranked Command-K search across tabs, bookmarks, history, Spaces and commands."
+            echo "- NOVA Spaces: eight named local workspaces with independently restored tabs."
+            echo "- Visual Tab Gallery: Command-Shift-G live snapshot overview."
+            echo "- Pinned and reorderable tabs with saved layout and native drag and drop."
+            echo "- Focus Reader: Command-Shift-R local article extraction and reading controls."
+            echo "- Workspace backup, migration, and resilient NOVA Search endpoints."
             echo ""
             echo "**Note:** This build is ad-hoc signed rather than Apple Developer ID notarized."
           } > release-notes.md
@@ -93,4 +94,4 @@ jobs:
               echo "**Manual install required:** The previous Sparkle signing key was not available in CI, so this release does not change the automatic-update feed."
             } >> release-notes.md
           fi
-          gh release create "$TAG" "${ASSETS[@]}" --target "$(git rev-parse HEAD)" --title "Nova OS $VERSION — Orbit" --notes-file release-notes.md
+          gh release create "$TAG" "${ASSETS[@]}" --target "$(git rev-parse HEAD)" --title "Nova OS $VERSION — Flow" --notes-file release-notes.md

@@ -87,7 +87,7 @@ private enum NovaOS {
     <body>
       <main>
         <div class="mark" aria-hidden="true"><svg viewBox="0 0 64 64" width="40" height="40" fill="none"><ellipse cx="32" cy="32" rx="27" ry="12" transform="rotate(-28 32 32)" stroke="#e2d5ff" stroke-width="3"/><path d="M32 7c3.5 17 7.5 21.5 25 25-17.5 3.5-21.5 8-25 25-3.5-17-7.5-21.5-25-25C24.5 28.5 28.5 24 32 7Z" fill="white"/><path d="M8 42c12 12 38 2 48-16" stroke="#fff" stroke-opacity=".9" stroke-width="3" stroke-linecap="round"/></svg></div>
-        <p class="eyebrow">NOVA BROWSER</p>
+        <p class="eyebrow">NOVA OS</p>
         <h1 id="greeting">A better place to explore.</h1>
         <p class="subtitle">Your web, thoughtfully organized.</p>
         <form id="search" role="search">
@@ -218,7 +218,20 @@ private enum NovaOS {
       details.append(site,title,snippet);link.append(details);results.append(link);return true;}
     async function search(type){const current=++sequence;if(activeRequest)activeRequest.abort();if(type!=='all')clearOverview();document.querySelectorAll('nav button').forEach(button=>button.setAttribute('aria-selected',String(button.dataset.type===type)));
       results.className=type==='images'?'grid':type==='videos'?'videos':'';provider.textContent='';summary.textContent='Searching '+(type==='all'?'the web':type)+' for “'+query+'”…';status('Looking for results…');
-      try{let data;const cached=searchCache.get(type);if(cached&&Date.now()-cached.time<300000){data=cached.data;activeRequest=null}else{activeRequest=new AbortController();const response=await fetch('https://nova-os-browser.vercel.app/api/search?q='+encodeURIComponent(query)+'&type='+encodeURIComponent(type),{cache:'no-store',signal:activeRequest.signal});if(!response.ok)throw new Error('Search unavailable');data=await response.json();if(current!==sequence)return;searchCache.set(type,{time:Date.now(),data});window.webkit?.messageHandlers?.novaCache?.postMessage({query,type,data});activeRequest=null}if(current!==sequence)return;
+      try{let data;const cached=searchCache.get(type);if(cached&&Date.now()-cached.time<300000){data=cached.data;activeRequest=null}else{activeRequest=new AbortController();
+        const searchPath='/api/search?q='+encodeURIComponent(query)+'&type='+encodeURIComponent(type);
+        let searchError=null;
+        for(const origin of ['https://nova-os-browser.vercel.app','https://nova-browser-frost.vercel.app']){
+          try{
+            const response=await fetch(origin+searchPath,{cache:'no-store',signal:activeRequest.signal});
+            if(!response.ok)throw new Error('Search service returned '+response.status);
+            const payload=await response.json();
+            if(!payload||!Array.isArray(payload.results))throw new Error('Invalid search response');
+            data=payload;break;
+          }catch(error){if(activeRequest.signal.aborted)throw error;searchError=error}
+        }
+        if(!data)throw searchError||new Error('Search unavailable');
+        if(current!==sequence)return;searchCache.set(type,{time:Date.now(),data});window.webkit?.messageHandlers?.novaCache?.postMessage({query,type,data});activeRequest=null}if(current!==sequence)return;
         results.replaceChildren();const items=Array.isArray(data.results)?data.results:[];let count=0;for(const item of items)if(addResult(item,type))count++;
         summary.textContent=(count?count+' results':'No results')+' for “'+query+'”';if(!count)status('No '+(type==='all'?'web':type)+' results found. Try another search.');
         if(type==='all'&&count)requestOverview(items);
@@ -246,6 +259,18 @@ private struct NovaOSMacApp {
 
 @MainActor
 private final class FrostTabStackView: NSStackView {
+    var onTabDrop: ((UUID, UUID) -> Bool)?
+
+    override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
+        sender.draggingPasteboard.string(forType: FlowDraggableTabButton.tabPasteboardType) == nil ? [] : .move
+    }
+
+    override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
+        guard let rawSource = sender.draggingPasteboard.string(forType: FlowDraggableTabButton.tabPasteboardType),
+              let source = UUID(uuidString: rawSource),
+              let target = identifier.flatMap({ UUID(uuidString: $0.rawValue) }) else { return false }
+        return onTabDrop?(source, target) ?? false
+    }
     var isActiveTab = false {
         didSet { needsDisplay = true }
     }
@@ -283,6 +308,7 @@ private final class BrowserTab {
     var isInternalPage = false
     var hasLoaded = false
     var sessionEntry: SessionEntry
+    var isPinned = false
     var overviewRequestID: UUID?
     var faviconURLString: String?
     var faviconRequestID: UUID?
@@ -385,6 +411,12 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     private var orbitPalette: OrbitCommandPaletteController?
     private var orbitFinder: OrbitFindController?
     private var recentlyClosedTabs: [SessionEntry] = []
+    private var recentlyClosedBySpace: [UUID: [SessionEntry]] = [:]
+    private var hasShownSpaceSaveFailure = false
+    private var flowState = FlowState.fresh()
+    private var spacesMenu: NSMenu!
+    private var flowGallery = FlowGalleryController()
+    private var flowReader = FlowReaderController()
     private static let overviewPreferenceKey = "NovaOS.AIOverviewsEnabled"
     private var overviewMenuItem: NSMenuItem?
     private var isOverviewEnabled: Bool {
@@ -696,6 +728,248 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
 
+
+    // MARK: - NOVA Flow — Spaces
+
+    private func snapshotCurrentSpace() {
+        guard let index = flowState.spaces.firstIndex(where: { $0.id == flowState.activeSpaceID }),
+              !tabs.isEmpty else { return }
+        flowState.spaces[index].tabs = tabs.map { tab in
+            FlowTabState(id: tab.id,
+                         kind: tab.sessionEntry.kind.rawValue,
+                         value: tab.sessionEntry.value,
+                         title: tab.webView.title ?? tab.button.title,
+                         pinned: tab.isPinned)
+        }
+        flowState.spaces[index].selectedTabID = selectedTabID
+    }
+
+    private func restoreFlowTabs(_ space: FlowSpaceState) {
+        pendingSessionSave?.cancel()
+        for snapshot in FlowOrder.pinnedFirst(space.tabs) {
+            let kind = SessionEntry.Kind(rawValue: snapshot.kind) ?? .home
+            let entry = SessionEntry(kind: kind, value: snapshot.value)
+            let tab = createTab(entry: entry, select: false, loadImmediately: false,
+                                id: snapshot.id, pinned: snapshot.pinned)
+            if !snapshot.title.isEmpty { tab.button.title = String(snapshot.title.prefix(30)) }
+        }
+        if tabs.isEmpty { _ = createTab() }
+        let restored = tabs.first(where: { $0.id == space.selectedTabID }) ?? tabs[0]
+        selectTab(restored)
+        scheduleSessionSave()
+    }
+
+    private func switchToSpace(_ spaceID: UUID, saveCurrent: Bool = true) {
+        guard flowState.spaces.contains(where: { $0.id == spaceID }),
+              flowState.activeSpaceID != spaceID else { return }
+        if saveCurrent { snapshotCurrentSpace() }
+        // Preserve closed-tab recovery within the owning Space, never leak it to another.
+        recentlyClosedBySpace[flowState.activeSpaceID] = recentlyClosedTabs
+        pendingSessionSave?.cancel()
+        let previous = tabs
+        tabs.removeAll()
+        selectedTabID = nil
+        for tab in previous {
+            tab.webView.stopLoading()
+            tab.webView.navigationDelegate = nil
+            tab.webView.uiDelegate = nil
+            tab.progressObservation = nil
+            tab.titleObservation = nil
+            tabBar.removeArrangedSubview(tab.itemView)
+            tab.itemView.removeFromSuperview()
+        }
+        contentHost.subviews.forEach { $0.removeFromSuperview() }
+        flowState.activeSpaceID = spaceID
+        recentlyClosedTabs = recentlyClosedBySpace[spaceID] ?? []
+        if let space = flowState.activeSpace { restoreFlowTabs(space) }
+        persistFlowState()
+    }
+
+    @objc private func selectSpaceFromMenu(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String,
+              let id = UUID(uuidString: raw) else { return }
+        switchToSpace(id)
+    }
+
+    @objc private func addSpace() {
+        guard flowState.spaces.count < 8 else {
+            showFlowAlert("Maximum Spaces reached", detail: "You can create up to eight spaces.")
+            return
+        }
+        guard let name = promptFlowName(title: "New Space", current: "My Space") else { return }
+        let next = FlowSpaceState(name: name)
+        flowState.spaces.append(next)
+        switchToSpace(next.id)
+    }
+
+    @objc private func renameSpace() {
+        guard let idx = flowState.spaces.firstIndex(where: { $0.id == flowState.activeSpaceID }),
+              let name = promptFlowName(title: "Rename Space", current: flowState.spaces[idx].name) else { return }
+        flowState.spaces[idx].name = name
+        persistFlowState()
+    }
+
+    @objc private func removeSpace() {
+        guard flowState.spaces.count > 1,
+              let index = flowState.spaces.firstIndex(where: { $0.id == flowState.activeSpaceID }) else { return }
+        let alert = NSAlert()
+        alert.messageText = "Delete “\(flowState.spaces[index].name)”?"
+        alert.informativeText = "The tabs in this space will be closed. This cannot be undone."
+        alert.addButton(withTitle: "Delete Space")
+        alert.addButton(withTitle: "Cancel")
+        alert.alertStyle = .warning
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        let replacement = flowState.spaces.first { $0.id != flowState.activeSpaceID }!.id
+        let removedID = flowState.activeSpaceID
+        flowState.spaces.remove(at: index)
+        recentlyClosedBySpace.removeValue(forKey: removedID)
+        switchToSpace(replacement, saveCurrent: false)
+    }
+
+    private func promptFlowName(title: String, current: String) -> String? {
+        let alert = NSAlert()
+        alert.messageText = title
+        alert.informativeText = "Choose a short name for your browser workspace."
+        let field = NSTextField(string: current)
+        field.frame = NSRect(x: 0, y: 0, width: 280, height: 25)
+        alert.accessoryView = field
+        alert.addButton(withTitle: "Save")
+        alert.addButton(withTitle: "Cancel")
+        guard alert.runModal() == .alertFirstButtonReturn else { return nil }
+        let name = String(field.stringValue.trimmingCharacters(in: .whitespacesAndNewlines).prefix(32))
+        return name.isEmpty ? nil : name
+    }
+
+    private func showFlowAlert(_ message: String, detail: String) {
+        let alert = NSAlert()
+        alert.messageText = message
+        alert.informativeText = detail
+        alert.runModal()
+    }
+
+    // MARK: - Pinned, reorderable tabs
+
+    private func refreshTabStripOrder() {
+        for tab in tabs {
+            tabBar.removeArrangedSubview(tab.itemView)
+            tab.itemView.removeFromSuperview()
+        }
+        for (index, tab) in tabs.enumerated() {
+            tabBar.insertArrangedSubview(tab.itemView, at: index)
+            updateTab(tab)
+        }
+        scheduleSessionSave()
+    }
+
+    @discardableResult
+    private func moveTab(from movingID: UUID, to targetID: UUID) -> Bool {
+        let snapshots = tabs.map { FlowTabState(id: $0.id, pinned: $0.isPinned) }
+        let moved = FlowOrder.moved(snapshots, from: movingID, to: targetID)
+        guard moved.map(\.id) != snapshots.map(\.id) else { return false }
+        let byID = Dictionary(uniqueKeysWithValues: tabs.map { ($0.id, $0) })
+        tabs = moved.compactMap { byID[$0.id] }
+        refreshTabStripOrder()
+        return true
+    }
+
+    @objc private func togglePinFromMenu(_ sender: NSMenuItem) {
+        guard let raw = sender.representedObject as? String,
+              let tab = tab(id: raw) else { return }
+        tab.isPinned.toggle()
+        tabs = tabs.filter(\.isPinned) + tabs.filter { !$0.isPinned }
+        refreshTabStripOrder()
+    }
+
+    @objc private func moveTabLeft(_ sender: NSMenuItem) {
+        guard let tab = tab(id: sender.representedObject as? String),
+              let idx = tabs.firstIndex(where: { $0.id == tab.id }), idx > 0 else { return }
+        _ = moveTab(from: tab.id, to: tabs[idx - 1].id)
+    }
+
+    @objc private func moveTabRight(_ sender: NSMenuItem) {
+        guard let tab = tab(id: sender.representedObject as? String),
+              let idx = tabs.firstIndex(where: { $0.id == tab.id }), idx + 1 < tabs.count else { return }
+        _ = moveTab(from: tab.id, to: tabs[idx + 1].id)
+    }
+
+    private func tabContextMenu(id: UUID) -> NSMenu {
+        let menu = NSMenu(title: "Tab")
+        for (title, action) in [
+            ("Pin Tab", #selector(togglePinFromMenu(_:))),
+            ("Move Left", #selector(moveTabLeft(_:))),
+            ("Move Right", #selector(moveTabRight(_:)))
+        ] {
+            let entry = NSMenuItem(title: title, action: action, keyEquivalent: "")
+            entry.representedObject = id.uuidString
+            entry.target = self
+            menu.addItem(entry)
+        }
+        return menu
+    }
+
+    @objc private func toggleCurrentTabPin() {
+        guard let tab = selectedTab else { return }
+        tab.isPinned.toggle()
+        tabs = tabs.filter(\.isPinned) + tabs.filter { !$0.isPinned }
+        refreshTabStripOrder()
+    }
+
+    // MARK: - Gallery and local Focus Reader
+
+    @objc private func showFlowGallery() {
+        let items = tabs.map { tab in
+            FlowGalleryItem(
+                id: tab.id,
+                title: tab.webView.title ?? tab.button.title,
+                detail: tab.webView.url?.absoluteString ?? tab.sessionEntry.value ?? "New Tab",
+                pinned: tab.isPinned,
+                webView: tab.webView,
+                isLoaded: tab.hasLoaded
+            )
+        }
+        flowGallery.show(items: items) { [weak self] id in
+            guard let self, let tab = self.tabs.first(where: { $0.id == id }) else { return }
+            self.selectTab(tab)
+            self.window.makeKeyAndOrderFront(nil)
+        }
+    }
+
+    @objc private func showFocusReader() {
+        guard let tab = selectedTab, !tab.isInternalPage,
+              let pageURL = tab.webView.url,
+              ["http", "https"].contains(pageURL.scheme?.lowercased() ?? "") else {
+            showFlowAlert("Reader unavailable", detail: "Open an article on a website to use Focus Reader.")
+            return
+        }
+        // Extract only visible article-like text. Never execute scripts in the reader,
+        // save body content, or replace the original WKWebView navigation state.
+        let extract = #"""
+        (() => {
+          const root = document.querySelector('article, [role="main"], main') || document.body;
+          if (!root) return null;
+          const nodes = Array.from(root.querySelectorAll('h1,h2,h3,p,blockquote,li'));
+          const chunks = nodes.map(el => (el.innerText || '').trim())
+            .filter(v => v.length > 30 && v.length < 15000);
+          const text = (chunks.length >= 3 ? chunks.join('\n\n') : root.innerText || '')
+            .trim().slice(0, 100000);
+          return {title: document.title || 'Untitled article', text};
+        })();
+        """#
+        tab.webView.evaluateJavaScript(extract) { [weak self, weak tab] value, _ in
+            guard let self, let tab,
+                  self.tabs.contains(where: { $0 === tab }),
+                  tab.webView.url == pageURL,
+                  let response = value as? [String: Any],
+                  let text = response["text"] as? String,
+                  text.trimmingCharacters(in: .whitespacesAndNewlines).count >= 100 else {
+                self?.showFlowAlert("Nothing readable found", detail: "This page does not contain enough article text to open Focus Reader.")
+                return
+            }
+            let title = response["title"] as? String ?? "Article"
+            self.flowReader.show(title: title, body: text, source: pageURL)
+        }
+    }
+
     // MARK: - Orbit: keyboard-first commands, tab recovery, and page search
 
     @objc private func showOrbitPalette() {
@@ -710,13 +984,31 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     private func orbitItems(matching input: String) -> [OrbitCommandPaletteController.Item] {
-        var items: [OrbitCommandPaletteController.Item] = []
         let query = input.trimmingCharacters(in: .whitespacesAndNewlines)
-        func offer(_ title: String, _ detail: String, _ symbol: String, _ action: @escaping () -> Void) {
-            guard query.isEmpty || (title + " " + detail).localizedCaseInsensitiveContains(query) else { return }
-            items.append(.init(title: title, detail: detail, symbol: symbol, perform: action))
+        var scored: [(score: Int, item: OrbitCommandPaletteController.Item)] = []
+        func offer(_ title: String, _ detail: String, _ symbol: String,
+                   bonus: Int = 0, _ perform: @escaping () -> Void) {
+            let score = FlowOmniRank.score(title: title, detail: detail, query: query)
+            guard query.isEmpty || score > 0 else { return }
+            scored.append((score + bonus, .init(title: title, detail: detail, symbol: symbol, perform: perform)))
+        }
+        if !query.isEmpty, let destination = NovaNavigation.resolve(query) {
+            switch destination {
+            case .website(let url):
+                offer("Open \(url.host ?? query)", url.absoluteString, "globe", bonus: 300) { [weak self] in
+                    guard let self, let tab = self.selectedTab else { return }
+                    self.navigate(url.absoluteString, in: tab)
+                }
+            case .search:
+                offer("Search NOVA for “\(query)”", "Web search", "magnifyingglass", bonus: 300) { [weak self] in
+                    guard let self, let tab = self.selectedTab else { return }
+                    self.loadSearch(query, in: tab)
+                }
+            }
         }
         offer("New Tab", "Open a fresh tab", "plus") { [weak self] in self?.newTab() }
+        offer("Visual Tab Gallery", "Browse open tab snapshots", "square.grid.2x2") { [weak self] in self?.showFlowGallery() }
+        offer("Focus Reader", "Read the current article without distractions", "text.book.closed") { [weak self] in self?.showFocusReader() }
         offer("Find in Page", "Search text on the current page", "text.magnifyingglass") { [weak self] in self?.showFindOnPage() }
         offer("Downloads", "Show recent downloads", "arrow.down.circle") { [weak self] in
             guard let self else { return }
@@ -724,34 +1016,39 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
         offer("Address Bar", "Enter a URL or search", "globe") { [weak self] in self?.focusAddress() }
         if !recentlyClosedTabs.isEmpty {
-            offer("Reopen Closed Tab", "Restore your last closed page", "arrow.uturn.backward") { [weak self] in
-                self?.reopenClosedTab()
-            }
+            offer("Reopen Closed Tab", "Restore last closed page", "arrow.uturn.backward") { [weak self] in self?.reopenClosedTab() }
+        }
+        for space in flowState.spaces where space.id != flowState.activeSpaceID {
+            offer("Switch to \(space.name)", "Browser workspace", "rectangle.3.group") { [weak self] in self?.switchToSpace(space.id) }
         }
         for tab in tabs {
-            let tabID = tab.id
-            let title = tab.webView.title?.trimmingCharacters(in: .whitespacesAndNewlines)
-            let displayTitle = title.flatMap { $0.isEmpty ? nil : $0 } ?? "New Tab"
-            offer(displayTitle, tab.sessionEntry.value ?? "Open tab", "square.on.square") { [weak self] in
-                guard let self, let target = self.tabs.first(where: { $0.id == tabID }) else { return }
-                self.selectTab(target)
+            let id = tab.id
+            let title = tab.webView.title?.isEmpty == false ? tab.webView.title! : tab.button.title
+            offer(title, tab.sessionEntry.value ?? "Open tab", tab.isPinned ? "pin.fill" : "square.on.square", bonus: 30) { [weak self] in
+                guard let self, let tab = self.tabs.first(where: { $0.id == id }) else { return }
+                self.selectTab(tab)
             }
         }
         for bookmark in bookmarks.reversed() {
             let entry = SessionEntry(kind: .website, value: bookmark.url)
             offer(bookmark.title, bookmark.url, "star") { [weak self] in
-                guard let self, let current = self.selectedTab else { return }
-                self.openSessionEntry(entry, in: current)
+                guard let self, let tab = self.selectedTab else { return }
+                self.openSessionEntry(entry, in: tab)
             }
         }
-        for item in history.prefix(15) {
-            let entry = item.sessionEntry
-            offer(item.title, entry.value ?? "Recent page", "clock") { [weak self] in
-                guard let self, let current = self.selectedTab else { return }
-                self.openSessionEntry(entry, in: current)
+        for entry in history.prefix(30) {
+            let snapshot = entry.sessionEntry
+            offer(entry.title, snapshot.value ?? "Recent", "clock") { [weak self] in
+                guard let self, let tab = self.selectedTab else { return }
+                self.openSessionEntry(snapshot, in: tab)
             }
         }
-        return items
+        return scored.enumerated()
+            .sorted { left, right in
+                left.element.score == right.element.score ? left.offset < right.offset
+                    : left.element.score > right.element.score
+            }
+            .map(\.element.item)
     }
 
     @objc private func showFindOnPage() {
@@ -762,6 +1059,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
 
     @objc private func reopenClosedTab() {
         guard !recentlyClosedTabs.isEmpty else { return }
+        guard tabs.count < 40 else {
+            showFlowAlert("Space tab limit", detail: "Close a tab before reopening another in this Space.")
+            return
+        }
         let entry = recentlyClosedTabs.removeFirst()
         _ = createTab(entry: entry, select: true)
     }
@@ -795,7 +1096,9 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     private func createTab(
         entry: SessionEntry = SessionEntry(kind: .home, value: nil),
         select: Bool = true,
-        loadImmediately: Bool = true
+        loadImmediately: Bool = true,
+        id: UUID = UUID(),
+        pinned: Bool = false
     ) -> BrowserTab {
         let configuration = WKWebViewConfiguration()
         configuration.websiteDataStore = .default()
@@ -807,8 +1110,8 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         webView.uiDelegate = self
         webView.allowsBackForwardNavigationGestures = true
 
-        let id = UUID()
-        let tabButton = NSButton(title: "New Tab", target: self, action: #selector(selectTabFromButton(_:)))
+        let tabButton = FlowDraggableTabButton(title: "New Tab", target: self, action: #selector(selectTabFromButton(_:)))
+        tabButton.menu = tabContextMenu(id: id)
         tabButton.identifier = NSUserInterfaceItemIdentifier(id.uuidString)
         tabButton.bezelStyle = .toolbar
         tabButton.image = NSImage(systemSymbolName: "sparkle", accessibilityDescription: "Nova tab")
@@ -837,6 +1140,11 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         itemView.heightAnchor.constraint(equalToConstant: 29).isActive = true
 
         let tab = BrowserTab(id: id, webView: webView, button: tabButton, closeButton: closeButton, itemView: itemView, sessionEntry: entry)
+        tab.isPinned = pinned
+        itemView.registerForDraggedTypes([FlowDraggableTabButton.tabPasteboardType])
+        itemView.onTabDrop = { [weak self] movingID, targetID in
+            self?.moveTab(from: movingID, to: targetID) ?? false
+        }
         tab.isInternalPage = entry.kind != .website
         tab.progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] webView, _ in
             DispatchQueue.main.async { self?.updateProgress(for: webView) }
@@ -847,8 +1155,13 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             }
         }
         itemView.identifier = NSUserInterfaceItemIdentifier(id.uuidString)
-        tabs.append(tab)
-        tabBar.insertArrangedSubview(itemView, at: max(0, tabBar.arrangedSubviews.count - 1))
+        if pinned {
+            let insertion = tabs.firstIndex(where: { !$0.isPinned }) ?? tabs.count
+            tabs.insert(tab, at: insertion)
+        } else {
+            tabs.append(tab)
+        }
+        tabBar.insertArrangedSubview(itemView, at: tabs.firstIndex(where: { $0.id == id }) ?? 0)
 
         if select { selectTab(tab) }
         else if loadImmediately { loadTabIfNeeded(tab) }
@@ -919,7 +1232,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         let host = tab.webView.url?.host
         let title = (pageTitle?.isEmpty == false ? pageTitle : nil) ?? host ?? "New Tab"
         let tabTitle = title == "New Tab — Nova OS" ? "New Tab" : title
-        tab.button.title = tabTitle.count > 28 ? String(tabTitle.prefix(27)) + "…" : tabTitle
+        tab.button.title = tab.isPinned ? "📌" : (tabTitle.count > 28 ? String(tabTitle.prefix(27)) + "…" : tabTitle)
+        tab.button.menu?.items.first?.title = tab.isPinned ? "Unpin Tab" : "Pin Tab"
+        tab.button.constraints.first(where: { $0.firstAttribute == .width })?.constant = tab.isPinned ? 44 : 178
+        tab.itemView.constraints.first(where: { $0.firstAttribute == .width })?.constant = tab.isPinned ? 74 : 208
         tab.button.toolTip = tab.webView.url?.absoluteString ?? title
         if tab.id == selectedTabID {
             window.title = title == NovaOS.appName || title.hasSuffix(" — \(NovaOS.appName)") ? title : "\(title) — \(NovaOS.appName)"
@@ -1142,6 +1458,12 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     private func restoreSession() {
+        if let restored = FlowStore.load(fileURL: FlowStore.applicationSupportURL) {
+            flowState = restored
+            if let space = flowState.activeSpace { restoreFlowTabs(space) }
+            return
+        }
+        flowState = .fresh()
         guard let data = UserDefaults.standard.data(forKey: Self.sessionDefaultsKey),
               let saved = try? JSONDecoder().decode(SavedSession.self, from: data), !saved.tabs.isEmpty else {
             _ = createTab()
@@ -1223,8 +1545,22 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             return entry
         }
         let state = SavedSession(tabs: entries, selectedIndex: selectedIndex)
-        guard let data = try? JSONEncoder().encode(state) else { return }
-        UserDefaults.standard.set(data, forKey: Self.sessionDefaultsKey)
+        if let data = try? JSONEncoder().encode(state) {
+            UserDefaults.standard.set(data, forKey: Self.sessionDefaultsKey)
+        }
+        snapshotCurrentSpace()
+        persistFlowState()
+    }
+
+    /// A failed save must not be silently discarded: the user could lose entire Spaces.
+    private func persistFlowState() {
+        if FlowStore.save(flowState, fileURL: FlowStore.applicationSupportURL) {
+            hasShownSpaceSaveFailure = false
+        } else if !hasShownSpaceSaveFailure {
+            hasShownSpaceSaveFailure = true
+            showFlowAlert("Couldn't save Spaces",
+                          detail: "NOVA OS could not save your workspace state. Check available disk space and permissions before quitting.")
+        }
     }
 
     private func configureMenu() {
@@ -1260,11 +1596,28 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         appMenuItem.submenu = appMenu
         mainMenu.addItem(appMenuItem)
 
+        let spacesItem = NSMenuItem(title: "Spaces", action: nil, keyEquivalent: "")
+        spacesMenu = NSMenu(title: "Spaces")
+        spacesMenu.delegate = self
+        spacesItem.submenu = spacesMenu
+        mainMenu.addItem(spacesItem)
+
         let fileMenuItem = NSMenuItem(title: "File", action: nil, keyEquivalent: "")
         let fileMenu = NSMenu(title: "File")
         let commandsItem = NSMenuItem(title: "NOVA Command Palette", action: #selector(showOrbitPalette), keyEquivalent: "k")
         commandsItem.target = self
         fileMenu.addItem(commandsItem)
+        let galleryItem = NSMenuItem(title: "Visual Tab Gallery", action: #selector(showFlowGallery), keyEquivalent: "g")
+        galleryItem.keyEquivalentModifierMask = [.command, .shift]
+        galleryItem.target = self
+        fileMenu.addItem(galleryItem)
+        let readerItem = NSMenuItem(title: "Focus Reader", action: #selector(showFocusReader), keyEquivalent: "r")
+        readerItem.keyEquivalentModifierMask = [.command, .shift]
+        readerItem.target = self
+        fileMenu.addItem(readerItem)
+        let pinItem = NSMenuItem(title: "Pin / Unpin Current Tab", action: #selector(toggleCurrentTabPin), keyEquivalent: "")
+        pinItem.target = self
+        fileMenu.addItem(pinItem)
         let findItem = NSMenuItem(title: "Find in Page", action: #selector(showFindOnPage), keyEquivalent: "f")
         findItem.target = self
         fileMenu.addItem(findItem)
@@ -1330,7 +1683,28 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
-        if menu === bookmarksMenu {
+        if menu === spacesMenu {
+            menu.removeAllItems()
+            for (index, space) in flowState.spaces.enumerated() {
+                let item = NSMenuItem(title: space.name, action: #selector(selectSpaceFromMenu(_:)), keyEquivalent: index < 8 ? String(index + 1) : "")
+                item.keyEquivalentModifierMask = [.command, .option]
+                item.target = self
+                item.representedObject = space.id.uuidString
+                item.state = space.id == flowState.activeSpaceID ? .on : .off
+                menu.addItem(item)
+            }
+            menu.addItem(.separator())
+            for (title, action) in [
+                ("New Space…", #selector(addSpace)),
+                ("Rename Current Space…", #selector(renameSpace)),
+                ("Delete Current Space…", #selector(removeSpace))
+            ] {
+                let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+                item.target = self
+                item.isEnabled = title != "Delete Current Space…" || flowState.spaces.count > 1
+                menu.addItem(item)
+            }
+        } else if menu === bookmarksMenu {
             menu.removeAllItems()
             let addItem = NSMenuItem(title: isCurrentPageBookmarked ? "Remove Bookmark" : "Bookmark This Page", action: #selector(toggleCurrentBookmark), keyEquivalent: "d")
             addItem.target = self
@@ -1604,6 +1978,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     @objc private func newTab() {
+        guard tabs.count < 40 else {
+            showFlowAlert("Space tab limit", detail: "A Space can contain up to 40 tabs. Close a tab or open another Space.")
+            return
+        }
         _ = createTab()
     }
 
@@ -1623,6 +2001,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     private func closeTab(id: String?) {
         guard let tab = tab(id: id), let index = tabs.firstIndex(where: { $0.id == tab.id }) else { return }
         guard tabs.count > 1 else {
+            // Closing the final pinned tab resets it to a regular New Tab.
+            if tab.isPinned {
+                tab.isPinned = false
+            }
             if tab.sessionEntry.kind != .home {
                 recentlyClosedTabs.insert(tab.sessionEntry, at: 0)
                 recentlyClosedTabs = Array(recentlyClosedTabs.prefix(12))
@@ -1631,6 +2013,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             tab.isInternalPage = true
             tab.hasLoaded = true
             tab.webView.loadHTMLString(NovaOS.newTabHTML, baseURL: nil)
+            refreshTabStripOrder()
             scheduleSessionSave()
             return
         }
@@ -1858,7 +2241,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         for navigationAction: WKNavigationAction,
         windowFeatures: WKWindowFeatures
     ) -> WKWebView? {
-        guard navigationAction.targetFrame == nil else { return nil }
+        guard navigationAction.targetFrame == nil, tabs.count < 40 else { return nil }
         return createTab().webView
     }
 }
