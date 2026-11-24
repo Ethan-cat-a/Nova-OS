@@ -221,7 +221,7 @@ private enum NovaOS {
       try{let data;const cached=searchCache.get(type);if(cached&&Date.now()-cached.time<300000){data=cached.data;activeRequest=null}else{activeRequest=new AbortController();
         const searchPath='/api/search?q='+encodeURIComponent(query)+'&type='+encodeURIComponent(type);
         let searchError=null;
-        for(const origin of ['https://nova-os-frost.vercel.app','https://nova-os-browser.vercel.app']){
+        for(const origin of ['https://nova-os-browser.vercel.app','https://nova-browser-frost.vercel.app']){
           try{
             const response=await fetch(origin+searchPath,{cache:'no-store',signal:activeRequest.signal});
             if(!response.ok)throw new Error('Search service returned '+response.status);
