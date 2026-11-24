@@ -87,7 +87,7 @@ private enum NovaOS {
     <body>
       <main>
         <div class="mark" aria-hidden="true"><svg viewBox="0 0 64 64" width="40" height="40" fill="none"><ellipse cx="32" cy="32" rx="27" ry="12" transform="rotate(-28 32 32)" stroke="#e2d5ff" stroke-width="3"/><path d="M32 7c3.5 17 7.5 21.5 25 25-17.5 3.5-21.5 8-25 25-3.5-17-7.5-21.5-25-25C24.5 28.5 28.5 24 32 7Z" fill="white"/><path d="M8 42c12 12 38 2 48-16" stroke="#fff" stroke-opacity=".9" stroke-width="3" stroke-linecap="round"/></svg></div>
-        <p class="eyebrow">NOVA BROWSER</p>
+        <p class="eyebrow">NOVA OS</p>
         <h1 id="greeting">A better place to explore.</h1>
         <p class="subtitle">Your web, thoughtfully organized.</p>
         <form id="search" role="search">
@@ -218,7 +218,20 @@ private enum NovaOS {
       details.append(site,title,snippet);link.append(details);results.append(link);return true;}
     async function search(type){const current=++sequence;if(activeRequest)activeRequest.abort();if(type!=='all')clearOverview();document.querySelectorAll('nav button').forEach(button=>button.setAttribute('aria-selected',String(button.dataset.type===type)));
       results.className=type==='images'?'grid':type==='videos'?'videos':'';provider.textContent='';summary.textContent='Searching '+(type==='all'?'the web':type)+' for “'+query+'”…';status('Looking for results…');
-      try{let data;const cached=searchCache.get(type);if(cached&&Date.now()-cached.time<300000){data=cached.data;activeRequest=null}else{activeRequest=new AbortController();const response=await fetch('https://nova-os-browser.vercel.app/api/search?q='+encodeURIComponent(query)+'&type='+encodeURIComponent(type),{cache:'no-store',signal:activeRequest.signal});if(!response.ok)throw new Error('Search unavailable');data=await response.json();if(current!==sequence)return;searchCache.set(type,{time:Date.now(),data});window.webkit?.messageHandlers?.novaCache?.postMessage({query,type,data});activeRequest=null}if(current!==sequence)return;
+      try{let data;const cached=searchCache.get(type);if(cached&&Date.now()-cached.time<300000){data=cached.data;activeRequest=null}else{activeRequest=new AbortController();
+        const searchPath='/api/search?q='+encodeURIComponent(query)+'&type='+encodeURIComponent(type);
+        let searchError=null;
+        for(const origin of ['https://nova-os-frost.vercel.app','https://nova-os-browser.vercel.app']){
+          try{
+            const response=await fetch(origin+searchPath,{cache:'no-store',signal:activeRequest.signal});
+            if(!response.ok)throw new Error('Search service returned '+response.status);
+            const payload=await response.json();
+            if(!payload||!Array.isArray(payload.results))throw new Error('Invalid search response');
+            data=payload;break;
+          }catch(error){if(activeRequest.signal.aborted)throw error;searchError=error}
+        }
+        if(!data)throw searchError||new Error('Search unavailable');
+        if(current!==sequence)return;searchCache.set(type,{time:Date.now(),data});window.webkit?.messageHandlers?.novaCache?.postMessage({query,type,data});activeRequest=null}if(current!==sequence)return;
         results.replaceChildren();const items=Array.isArray(data.results)?data.results:[];let count=0;for(const item of items)if(addResult(item,type))count++;
         summary.textContent=(count?count+' results':'No results')+' for “'+query+'”';if(!count)status('No '+(type==='all'?'web':type)+' results found. Try another search.');
         if(type==='all'&&count)requestOverview(items);
@@ -398,6 +411,8 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     private var orbitPalette: OrbitCommandPaletteController?
     private var orbitFinder: OrbitFindController?
     private var recentlyClosedTabs: [SessionEntry] = []
+    private var recentlyClosedBySpace: [UUID: [SessionEntry]] = [:]
+    private var hasShownSpaceSaveFailure = false
     private var flowState = FlowState.fresh()
     private var spacesMenu: NSMenu!
     private var flowGallery = FlowGalleryController()
@@ -748,6 +763,8 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         guard flowState.spaces.contains(where: { $0.id == spaceID }),
               flowState.activeSpaceID != spaceID else { return }
         if saveCurrent { snapshotCurrentSpace() }
+        // Preserve closed-tab recovery within the owning Space, never leak it to another.
+        recentlyClosedBySpace[flowState.activeSpaceID] = recentlyClosedTabs
         pendingSessionSave?.cancel()
         let previous = tabs
         tabs.removeAll()
@@ -763,8 +780,9 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         }
         contentHost.subviews.forEach { $0.removeFromSuperview() }
         flowState.activeSpaceID = spaceID
+        recentlyClosedTabs = recentlyClosedBySpace[spaceID] ?? []
         if let space = flowState.activeSpace { restoreFlowTabs(space) }
-        _ = FlowStore.save(flowState)
+        persistFlowState()
     }
 
     @objc private func selectSpaceFromMenu(_ sender: NSMenuItem) {
@@ -788,7 +806,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         guard let idx = flowState.spaces.firstIndex(where: { $0.id == flowState.activeSpaceID }),
               let name = promptFlowName(title: "Rename Space", current: flowState.spaces[idx].name) else { return }
         flowState.spaces[idx].name = name
-        _ = FlowStore.save(flowState)
+        persistFlowState()
     }
 
     @objc private func removeSpace() {
@@ -802,7 +820,9 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         alert.alertStyle = .warning
         guard alert.runModal() == .alertFirstButtonReturn else { return }
         let replacement = flowState.spaces.first { $0.id != flowState.activeSpaceID }!.id
+        let removedID = flowState.activeSpaceID
         flowState.spaces.remove(at: index)
+        recentlyClosedBySpace.removeValue(forKey: removedID)
         switchToSpace(replacement, saveCurrent: false)
     }
 
@@ -938,6 +958,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         tab.webView.evaluateJavaScript(extract) { [weak self, weak tab] value, _ in
             guard let self, let tab,
                   self.tabs.contains(where: { $0 === tab }),
+                  tab.webView.url == pageURL,
                   let response = value as? [String: Any],
                   let text = response["text"] as? String,
                   text.trimmingCharacters(in: .whitespacesAndNewlines).count >= 100 else {
@@ -1437,7 +1458,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     private func restoreSession() {
-        if let restored = FlowStore.load() {
+        if let restored = FlowStore.load(fileURL: FlowStore.applicationSupportURL) {
             flowState = restored
             if let space = flowState.activeSpace { restoreFlowTabs(space) }
             return
@@ -1528,7 +1549,18 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             UserDefaults.standard.set(data, forKey: Self.sessionDefaultsKey)
         }
         snapshotCurrentSpace()
-        _ = FlowStore.save(flowState)
+        persistFlowState()
+    }
+
+    /// A failed save must not be silently discarded: the user could lose entire Spaces.
+    private func persistFlowState() {
+        if FlowStore.save(flowState, fileURL: FlowStore.applicationSupportURL) {
+            hasShownSpaceSaveFailure = false
+        } else if !hasShownSpaceSaveFailure {
+            hasShownSpaceSaveFailure = true
+            showFlowAlert("Couldn't save Spaces",
+                          detail: "NOVA OS could not save your workspace state. Check available disk space and permissions before quitting.")
+        }
     }
 
     private func configureMenu() {

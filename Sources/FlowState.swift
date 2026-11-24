@@ -91,16 +91,54 @@ struct FlowState: Codable, Equatable {
 enum FlowStore {
     static let key = "NovaOS.FlowSpaces.v1"
 
-    static func load(from defaults: UserDefaults = .standard) -> FlowState? {
-        guard let data = defaults.data(forKey: key), data.count < 1_000_000,
+    /// File-based storage handles the full 8 x 40 Space quota without UserDefaults size limits.
+    /// The old UserDefaults value is retained for migration and rollback compatibility.
+    static var applicationSupportURL: URL? {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+            .first?.appendingPathComponent("Nova OS", isDirectory: true)
+            .appendingPathComponent("flow-spaces-v1.json")
+    }
+
+    private static func decoded(_ data: Data?) -> FlowState? {
+        guard let data, data.count < 4_000_000,
               let value = try? JSONDecoder().decode(FlowState.self, from: data),
               value.schemaVersion == 1 else { return nil }
         return value.normalized()
     }
 
+    static func load(from defaults: UserDefaults = .standard, fileURL: URL? = nil) -> FlowState? {
+        if let fileURL {
+            if let current = decoded(try? Data(contentsOf: fileURL, options: .mappedIfSafe)) {
+                return current
+            }
+            // An interrupted or corrupted primary file must not erase the last good snapshot.
+            if let backup = decoded(try? Data(contentsOf: fileURL.appendingPathExtension("bak"), options: .mappedIfSafe)) {
+                return backup
+            }
+        }
+        return decoded(defaults.data(forKey: key))
+    }
+
     @discardableResult
-    static func save(_ state: FlowState, to defaults: UserDefaults = .standard) -> Bool {
-        guard let data = try? JSONEncoder().encode(state.normalized()), data.count < 1_000_000 else { return false }
+    static func save(_ state: FlowState, to defaults: UserDefaults = .standard, fileURL: URL? = nil) -> Bool {
+        guard let data = try? JSONEncoder().encode(state.normalized()), data.count < 4_000_000 else { return false }
+        if let fileURL {
+            do {
+                try FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(),
+                                                        withIntermediateDirectories: true)
+                if let prior = try? Data(contentsOf: fileURL, options: .mappedIfSafe),
+                   decoded(prior) != nil {
+                    try? prior.write(to: fileURL.appendingPathExtension("bak"), options: .atomic)
+                }
+                try data.write(to: fileURL, options: .atomic)
+                // Keep the last legacy snapshot where small enough; never block a large file save.
+                if data.count < 1_000_000 { defaults.set(data, forKey: key) }
+                return true
+            } catch {
+                return false
+            }
+        }
+        guard data.count < 1_000_000 else { return false }
         defaults.set(data, forKey: key)
         return true
     }

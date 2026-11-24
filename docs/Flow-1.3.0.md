@@ -104,3 +104,12 @@
 
 **Do not promise crash-free or automatic updates without the actual test
 and signing evidence.**
+
+
+### Post-audit fixes
+- **Large-workspace data loss:** Flow now writes its full state atomically under Application Support, with a last-known-good backup and UserDefaults migration fallback. UserDefaults alone could silently reject a full 8 × 40 tab snapshot due to its 1 MB guard.
+- **Cross-Space recovery:** recently closed tabs are kept in their originating Space for the current session.
+- **Reader navigation race:** asynchronous text extraction does not display stale content after the source tab navigates away.
+- **Search resilience:** native search first uses the project's stable Vercel domain, and falls back to the public NOVA OS alias if an endpoint is temporarily unavailable.
+- **Save errors:** state-write failures are surfaced instead of discarded.
+- **Tests:** full-quota save, corrupted primary restore, legacy migration.

@@ -83,6 +83,56 @@ final class FlowStateTests: XCTestCase {
         XCTAssertEqual(FlowOmniRank.score(title: "Github", detail: "", query: "absent"), 0)
     }
 
+
+    func testFileStorePersistsAllEightSpacesEvenWhenPayloadExceedsUserDefaultsLimit() throws {
+        let defaults = UserDefaults(suiteName: "NovaOS.FlowTests." + UUID().uuidString)!
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("spaces.json")
+        let longURL = "https://example.org/" + String(repeating: "a", count: 3500)
+        var state = FlowState.fresh()
+        state.spaces = (0..<8).map { index in
+            FlowSpaceState(name: "Space \(index)",
+                           tabs: (0..<40).map { _ in FlowTabState(kind: "website", value: longURL) })
+        }
+        state.activeSpaceID = state.spaces.last!.id
+        XCTAssertTrue(FlowStore.save(state, to: defaults, fileURL: url))
+        XCTAssertGreaterThan(try Data(contentsOf: url).count, 1_000_000)
+        let loaded = FlowStore.load(from: defaults, fileURL: url)
+        XCTAssertEqual(loaded?.spaces.count, 8)
+        XCTAssertTrue(loaded?.spaces.allSatisfy { $0.tabs.count == 40 } ?? false)
+        XCTAssertEqual(loaded?.activeSpaceID, state.activeSpaceID)
+    }
+
+    func testFileStoreFallsBackToBackupOnCorruption() throws {
+        let defaults = UserDefaults(suiteName: "NovaOS.FlowTests." + UUID().uuidString)!
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("spaces.json")
+        var original = FlowState.fresh()
+        original.spaces[0].name = "Recover This"
+        XCTAssertTrue(FlowStore.save(original, to: defaults, fileURL: url))
+        var revised = original
+        revised.spaces[0].name = "Updated Space"
+        XCTAssertTrue(FlowStore.save(revised, to: defaults, fileURL: url))
+        try Data("broken JSON".utf8).write(to: url, options: .atomic)
+        XCTAssertEqual(FlowStore.load(from: defaults, fileURL: url)?.spaces.first?.name, "Recover This")
+    }
+
+    func testLegacyUserDefaultsMigratesToFileStore() {
+        let defaults = UserDefaults(suiteName: "NovaOS.FlowTests." + UUID().uuidString)!
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathComponent("spaces.json")
+        defer { try? FileManager.default.removeItem(at: url.deletingLastPathComponent()) }
+        var legacy = FlowState.fresh()
+        legacy.spaces[0].name = "Imported"
+        XCTAssertTrue(FlowStore.save(legacy, to: defaults))
+        XCTAssertEqual(FlowStore.load(from: defaults, fileURL: url)?.spaces.first?.name, "Imported")
+        XCTAssertTrue(FlowStore.save(legacy, to: defaults, fileURL: url))
+        XCTAssertEqual(FlowStore.load(from: defaults, fileURL: url)?.spaces.first?.name, "Imported")
+    }
+
     func testCorruptPayloadFallsBack() {
         let defaults = UserDefaults(suiteName: UUID().uuidString)!
         defaults.set(Data("not-json".utf8), forKey: FlowStore.key)
