@@ -93,10 +93,15 @@ struct DimensionBoard: Codable, Equatable {
     mutating func add(url: URL?, title: String, note: String = "") -> Bool {
         guard tiles.count < Self.maxTiles, url == nil || MorphEffect.origin(url!) != nil else { return false }
         if let url, url.absoluteString.utf8.count > 4096 { return false }
-        let used = tiles
-        let pos = (0..<Self.maxTiles).map { (Double(24 + ($0 % 7) * 382), Double(24 + ($0 / 7) * 282)) }
-            .first { x,y in !used.contains { abs($0.x-x) < Self.tileWidth && abs($0.y-y) < Self.tileHeight } }
-            ?? (24 + Double(tiles.count % 7) * 382, 24 + Double(tiles.count / 7) * 282)
+        var pos = (24.0 + Double(tiles.count % 7) * 382.0, 24.0 + Double(tiles.count / 7) * 282.0)
+        for index in 0..<Self.maxTiles {
+            let x = 24.0 + Double(index % 7) * 382.0
+            let y = 24.0 + Double(index / 7) * 282.0
+            let occupied = tiles.contains { tile in
+                abs(tile.x - x) < Self.tileWidth && abs(tile.y - y) < Self.tileHeight
+            }
+            if !occupied { pos = (x, y); break }
+        }
         tiles.append(DimensionTile(url: url?.absoluteString, title: String(title.prefix(150)), note: String(note.prefix(2000)), x: pos.0, y: pos.1))
         return true
     }

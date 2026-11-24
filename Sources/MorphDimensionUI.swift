@@ -109,7 +109,7 @@ private final class DimensionCanvas: NSView {
     override var isFlipped: Bool { true }
     override func draw(_ dirtyRect: NSRect) {
         NSColor.windowBackgroundColor.setFill()
-        NSRectFill(dirtyRect)
+        NSBezierPath(rect: dirtyRect).fill()
         NSColor.secondaryLabelColor.withAlphaComponent(0.16).setFill()
         let startX = Int(dirtyRect.minX / 24) * 24
         let startY = Int(dirtyRect.minY / 24) * 24
