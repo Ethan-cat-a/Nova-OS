@@ -109,7 +109,7 @@ private final class DimensionCanvas: NSView {
     override var isFlipped: Bool { true }
     override func draw(_ dirtyRect: NSRect) {
         NSColor.windowBackgroundColor.setFill()
-        dirtyRect.fill()
+        NSRectFill(dirtyRect)
         NSColor.secondaryLabelColor.withAlphaComponent(0.16).setFill()
         let startX = Int(dirtyRect.minX / 24) * 24
         let startY = Int(dirtyRect.minY / 24) * 24
@@ -123,6 +123,7 @@ private final class DimensionCanvas: NSView {
 
 private final class DimensionDragHandle: NSView {
     var onMove: ((NSPoint, Bool) -> Void)?
+    override func hitTest(_ point: NSPoint) -> NSView? { super.hitTest(point) == nil ? nil : self }
     private var offset: NSPoint = .zero
     override func mouseDown(with event: NSEvent) {
         guard let card = superview, let canvas = card.superview else { return }

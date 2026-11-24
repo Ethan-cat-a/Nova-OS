@@ -63,13 +63,13 @@ jobs:
             exit 1
           fi
           {
-            echo "NOVA Flow brings smarter browsing, Spaces, tab organization, and Focus Reader."
+            echo "NOVA Dimension introduces a spatial web canvas and reversible website customization."
             echo ""
-            echo "- NOVA OmniSearch: ranked Command-K search across tabs, bookmarks, history, Spaces and commands."
-            echo "- NOVA Spaces: eight named local workspaces with independently restored tabs."
-            echo "- Visual Tab Gallery: Command-Shift-G live snapshot overview."
-            echo "- Pinned and reorderable tabs with saved layout and native drag and drop."
-            echo "- Focus Reader: Command-Shift-R local article extraction and reading controls."
+            echo "- NOVA Morph (Command-Shift-M): five local styles, supported natural-language instructions, reset, and optional site-specific preferences."
+            echo "- NOVA Dimension (Command-Shift-D): persistent zoomable workspace canvas with movable website and note cards."
+            echo "- Import tabs or add website URLs; activate up to four live isolated web previews."
+            echo "- Each Space has its own saved canvas; notes and positions stay on the Mac."
+            echo "- Retains Flow features: OmniSearch, Spaces, gallery, pinned tabs, and Focus Reader."
             echo "- Workspace backup, migration, and resilient NOVA Search endpoints."
             echo ""
             echo "**Note:** This build is ad-hoc signed rather than Apple Developer ID notarized."
@@ -94,4 +94,4 @@ jobs:
               echo "**Manual install required:** The previous Sparkle signing key was not available in CI, so this release does not change the automatic-update feed."
             } >> release-notes.md
           fi
-          gh release create "$TAG" "${ASSETS[@]}" --target "$(git rev-parse HEAD)" --title "Nova OS $VERSION — Flow" --notes-file release-notes.md
+          gh release create "$TAG" "${ASSETS[@]}" --target "$(git rev-parse HEAD)" --title "Nova OS $VERSION — Dimension" --notes-file release-notes.md

@@ -15,7 +15,7 @@ let package = Package(
             name: "NovaOS",
             dependencies: [.product(name: "Sparkle", package: "Sparkle")],
             path: "Sources",
-            sources: ["NovaOSApp.swift", "NovaNavigation.swift", "OrbitBrowserTools.swift", "FlowBrowserUI.swift", "FlowState.swift"]
+            sources: ["NovaOSApp.swift", "NovaNavigation.swift", "OrbitBrowserTools.swift", "FlowBrowserUI.swift", "FlowState.swift", "MorphDimensionState.swift", "MorphDimensionUI.swift"]
         ),
         .testTarget(name: "NovaOSTests", dependencies: ["NovaOS"], path: "Tests/NovaOSTests")
     ]

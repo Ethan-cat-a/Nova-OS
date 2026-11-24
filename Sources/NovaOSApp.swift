@@ -417,6 +417,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     private var spacesMenu: NSMenu!
     private var flowGallery = FlowGalleryController()
     private var flowReader = FlowReaderController()
+    private let dimension = DimensionController()
     private static let overviewPreferenceKey = "NovaOS.AIOverviewsEnabled"
     private var overviewMenuItem: NSMenuItem?
     private var isOverviewEnabled: Bool {
@@ -439,6 +440,7 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        dimension.close()
         saveSession()
     }
 
@@ -762,9 +764,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
     private func switchToSpace(_ spaceID: UUID, saveCurrent: Bool = true) {
         guard flowState.spaces.contains(where: { $0.id == spaceID }),
               flowState.activeSpaceID != spaceID else { return }
+        dimension.close()
         if saveCurrent { snapshotCurrentSpace() }
         // Preserve closed-tab recovery within the owning Space, never leak it to another.
-        recentlyClosedBySpace[flowState.activeSpaceID] = recentlyClosedTabs
+        if saveCurrent { recentlyClosedBySpace[flowState.activeSpaceID] = recentlyClosedTabs }
         pendingSessionSave?.cancel()
         let previous = tabs
         tabs.removeAll()
@@ -916,6 +919,38 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
 
     // MARK: - Gallery and local Focus Reader
 
+    @objc private func showMorph() {
+        guard let tab = selectedTab, !tab.isInternalPage, !tab.webView.isLoading,
+              let url = tab.webView.url, MorphEffect.origin(url) != nil else {
+            showFlowAlert("Morph unavailable", detail: "Open a loaded website to transform its appearance.")
+            return
+        }
+        MorphController.show(for: tab.webView)
+    }
+
+    @objc private func showDimension() {
+        let links: [DimensionController.Link] = tabs.compactMap { tab in
+            guard tab.sessionEntry.kind == .website, let raw = tab.sessionEntry.value,
+                  let url = URL(string: raw), MorphEffect.origin(url) != nil else { return nil }
+            return DimensionController.Link(title: tab.webView.title ?? url.host ?? "Website", url: url)
+        }
+        let activeID = flowState.activeSpaceID
+        dimension.show(space: activeID, name: flowState.activeSpace?.name ?? "My Space",
+                       validSpaces: Set(flowState.spaces.map(\.id)), links: links) { [weak self] url in
+            guard let self, self.flowState.activeSpaceID == activeID else { return }
+            if let existing = self.tabs.first(where: { $0.sessionEntry.value == url.absoluteString }) {
+                self.selectTab(existing)
+            } else {
+                guard self.tabs.count < 40 else {
+                    self.showFlowAlert("Space tab limit", detail: "Close a tab before opening another website.")
+                    return
+                }
+                _ = self.createTab(entry: SessionEntry(kind: .website, value: url.absoluteString))
+            }
+            self.window.makeKeyAndOrderFront(nil)
+        }
+    }
+
     @objc private func showFlowGallery() {
         let items = tabs.map { tab in
             FlowGalleryItem(
@@ -1007,6 +1042,8 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             }
         }
         offer("New Tab", "Open a fresh tab", "plus") { [weak self] in self?.newTab() }
+        offer("NOVA Morph", "Transform website appearance with reversible local styles", "wand.and.stars") { [weak self] in self?.showMorph() }
+        offer("NOVA Dimension", "Spatial canvas for websites and notes", "rectangle.3.group") { [weak self] in self?.showDimension() }
         offer("Visual Tab Gallery", "Browse open tab snapshots", "square.grid.2x2") { [weak self] in self?.showFlowGallery() }
         offer("Focus Reader", "Read the current article without distractions", "text.book.closed") { [weak self] in self?.showFocusReader() }
         offer("Find in Page", "Search text on the current page", "text.magnifyingglass") { [weak self] in self?.showFindOnPage() }
@@ -1607,6 +1644,14 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
         let commandsItem = NSMenuItem(title: "NOVA Command Palette", action: #selector(showOrbitPalette), keyEquivalent: "k")
         commandsItem.target = self
         fileMenu.addItem(commandsItem)
+        let morphItem = NSMenuItem(title: "NOVA Morph", action: #selector(showMorph), keyEquivalent: "m")
+        morphItem.keyEquivalentModifierMask = [.command, .shift]
+        morphItem.target = self
+        fileMenu.addItem(morphItem)
+        let dimensionItem = NSMenuItem(title: "NOVA Dimension", action: #selector(showDimension), keyEquivalent: "d")
+        dimensionItem.keyEquivalentModifierMask = [.command, .shift]
+        dimensionItem.target = self
+        fileMenu.addItem(dimensionItem)
         let galleryItem = NSMenuItem(title: "Visual Tab Gallery", action: #selector(showFlowGallery), keyEquivalent: "g")
         galleryItem.keyEquivalentModifierMask = [.command, .shift]
         galleryItem.target = self
@@ -2098,6 +2143,10 @@ private final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate
             let title = webView.title?.trimmingCharacters(in: .whitespacesAndNewlines)
             recordHistory(for: tab.sessionEntry, title: title.flatMap { $0.isEmpty ? nil : $0 } ?? url.host ?? url.absoluteString)
             scheduleSessionSave()
+        }
+        if !tab.isInternalPage, let url = webView.url {
+            let rules = MorphController.remembered(for: url)
+            if !rules.isEmpty { MorphController.apply(rules, to: webView, pageURL: url) }
         }
         updateTab(tab)
         loadFavicon(for: tab)
