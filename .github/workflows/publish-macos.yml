@@ -39,6 +39,18 @@ jobs:
             echo "::warning::No NOVA_SPARKLE_ED25519_PRIVATE secret: standalone installer only. This release will not be available through Sparkle automatic updates."
           fi
 
+      - name: Verify AI Overview removal
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -inE 'novaResearch|nova-v8\.vercel\.app|requestOverview|AIOverviewsEnabled|novaRenderOverview' Sources/*.swift; then
+            echo "::error::AI Overview code must not be shipped in 1.4.1"
+            exit 1
+          fi
+          grep -q '/api/search?q=' Sources/NovaOSApp.swift
+          grep -q "novaCache" Sources/NovaOSApp.swift
+          grep -q "showMorph" Sources/NovaOSApp.swift
+          grep -q "showDimension" Sources/NovaOSApp.swift
       - name: Run navigation unit tests
         run: swift test --disable-sandbox
 
@@ -63,8 +75,10 @@ jobs:
             exit 1
           fi
           {
-            echo "NOVA Dimension introduces a spatial web canvas and reversible website customization."
+            echo "NOVA OS 1.4.1 temporarily removes AI Overview to reduce load on NOVA Intelligence servers."
             echo ""
+            echo "- Removes AI Overview cards, automatic AI requests, the preference toggle, and the native AI bridge."
+            echo "- Regular web, image, video and news search remain available."
             echo "- NOVA Morph (Command-Shift-M): five local styles, supported natural-language instructions, reset, and optional site-specific preferences."
             echo "- NOVA Dimension (Command-Shift-D): persistent zoomable workspace canvas with movable website and note cards."
             echo "- Import tabs or add website URLs; activate up to four live isolated web previews."
