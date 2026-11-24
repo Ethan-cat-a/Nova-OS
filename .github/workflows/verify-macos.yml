@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/morph-dimension-1.4
+      - fix/1.4.1-no-overview
     paths:
       - "Sources/**"
       - "Tests/**"
@@ -29,6 +30,18 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+      - name: Verify AI Overview removal
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -inE 'novaResearch|nova-v8\.vercel\.app|requestOverview|AIOverviewsEnabled|novaRenderOverview' Sources/*.swift; then
+            echo "::error::AI Overview code must not be shipped in 1.4.1"
+            exit 1
+          fi
+          grep -q '/api/search?q=' Sources/NovaOSApp.swift
+          grep -q "novaCache" Sources/NovaOSApp.swift
+          grep -q "showMorph" Sources/NovaOSApp.swift
+          grep -q "showDimension" Sources/NovaOSApp.swift
       - name: Run Swift navigation tests
         run: swift test --disable-sandbox
       - name: Build universal macOS installer
@@ -39,12 +52,12 @@ jobs:
           set -euo pipefail
           test -f "dist/Nova-OS-Installer.pkg"
           test -d "dist/Nova OS.app"
-          /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "dist/Nova OS.app/Contents/Info.plist" | grep -x '1.4.0'
+          /usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' "dist/Nova OS.app/Contents/Info.plist" | grep -x '1.4.1'
           codesign --verify --deep --strict "dist/Nova OS.app"
       - name: Save beta installer for manual QA
         uses: actions/upload-artifact@v4
         with:
-          name: NOVA-OS-Dimension-1.4.0-macOS-Beta
+          name: NOVA-OS-Dimension-1.4.1-macOS-Beta
           path: dist/Nova-OS-Installer.pkg
           if-no-files-found: error
           retention-days: 7
